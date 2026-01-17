@@ -45,6 +45,16 @@ export function createServer(dataDir) {
     res.sendFile(join(__dirname, 'public', 'gov.html'));
   });
 
+  // 4-Column Board View
+  app.get('/board', (req, res) => {
+    res.sendFile(join(__dirname, 'public', 'board.html'));
+  });
+
+  // Force-Directed Graph View
+  app.get('/graph', (req, res) => {
+    res.sendFile(join(__dirname, 'public', 'graph.html'));
+  });
+
   // SPA fallback - serve index.html for all non-API routes
   app.get('*', (req, res) => {
     res.sendFile(join(__dirname, 'public', 'index.html'));

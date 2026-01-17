@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GovTrack - Board View</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .header {
+      background: #1a1a2e;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .header nav a {
+      color: #888;
+      text-decoration: none;
+      margin-left: 1.5rem;
+    }
+
+    .header nav a:hover,
+    .header nav a.active {
+      color: white;
+    }
+
+    .board-container {
+      display: flex;
+      height: calc(100vh - 60px);
+      overflow: hidden;
+    }
+
+    .column {
+      flex: 1;
+      min-width: 250px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #ddd;
+      background: white;
+    }
+
+    .column:last-child {
+      border-right: none;
+    }
+
+    .column-header {
+      padding: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.85rem;
+      border-bottom: 3px solid;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .column-header .count {
+      background: rgba(0,0,0,0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: 10px;
+      font-size: 0.75rem;
+    }
+
+    .column.goals .column-header { border-color: #4CAF50; color: #2e7d32; }
+    .column.problems .column-header { border-color: #f44336; color: #c62828; }
+    .column.ideas .column-header { border-color: #2196F3; color: #1565c0; }
+    .column.actions .column-header { border-color: #FF9800; color: #e65100; }
+
+    .column-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .card:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
+    }
+
+    .card.highlighted {
+      box-shadow: 0 0 0 2px #2196F3;
+    }
+
+    .card.dimmed {
+      opacity: 0.4;
+    }
+
+    .card-title {
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    .card-meta .badge {
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      background: #f0f0f0;
+    }
+
+    .card-meta .priority-0 { background: #ffebee; color: #c62828; }
+    .card-meta .priority-1 { background: #fff3e0; color: #e65100; }
+    .card-meta .priority-2 { background: #e3f2fd; color: #1565c0; }
+    .card-meta .priority-3 { background: #f3e5f5; color: #7b1fa2; }
+    .card-meta .priority-4 { background: #eceff1; color: #546e7a; }
+
+    .card-meta .status {
+      font-style: italic;
+    }
+
+    .relation-indicator {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      font-size: 0.7rem;
+      color: #999;
+    }
+
+    /* SVG overlay for connections */
+    .connections-overlay {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .connection-line {
+      fill: none;
+      stroke-width: 2;
+      opacity: 0.3;
+    }
+
+    .connection-line.threatens { stroke: #f44336; }
+    .connection-line.addresses { stroke: #2196F3; }
+    .connection-line.pursues { stroke: #4CAF50; }
+    .connection-line.implements { stroke: #FF9800; }
+    .connection-line.depends_on { stroke: #9C27B0; stroke-dasharray: 4; }
+    .connection-line.highlighted { opacity: 0.8; stroke-width: 3; }
+
+    /* Filter bar */
+    .filter-bar {
+      background: white;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .filter-bar select,
+    .filter-bar input {
+      padding: 0.4rem 0.6rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    .filter-bar label {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    /* Entity detail panel */
+    .detail-panel {
+      position: fixed;
+      right: 0;
+      top: 60px;
+      bottom: 0;
+      width: 400px;
+      background: white;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+      transform: translateX(100%);
+      transition: transform 0.3s;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .detail-panel.open {
+      transform: translateX(0);
+    }
+
+    .detail-panel-header {
+      padding: 1rem;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .detail-panel-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .detail-panel-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .detail-panel-content {
+      padding: 1rem;
+    }
+
+    .detail-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .detail-section h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+
+    .relation-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .relation-list li {
+      padding: 0.5rem;
+      background: #f9f9f9;
+      border-radius: 4px;
+      margin-bottom: 0.25rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .relation-list li:hover {
+      background: #e3f2fd;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>GovTrack Board</h1>
+    <nav>
+      <a href="/">Dashboard</a>
+      <a href="/board" class="active">Board</a>
+      <a href="/graph">Graph</a>
+    </nav>
+  </div>
+
+  <div class="filter-bar">
+    <label>Government:
+      <select id="gov-filter">
+        <option value="">All</option>
+      </select>
+    </label>
+    <label>Status:
+      <select id="status-filter">
+        <option value="">All</option>
+      </select>
+    </label>
+    <label>
+      <input type="checkbox" id="show-connections" checked>
+      Show connections
+    </label>
+  </div>
+
+  <div class="board-container" id="board">
+    <div class="column goals">
+      <div class="column-header">
+        Goals
+        <span class="count" id="goals-count">0</span>
+      </div>
+      <div class="column-content" id="goals-column"></div>
+    </div>
+
+    <div class="column problems">
+      <div class="column-header">
+        Problems
+        <span class="count" id="problems-count">0</span>
+      </div>
+      <div class="column-content" id="problems-column"></div>
+    </div>
+
+    <div class="column ideas">
+      <div class="column-header">
+        Ideas
+        <span class="count" id="ideas-count">0</span>
+      </div>
+      <div class="column-content" id="ideas-column"></div>
+    </div>
+
+    <div class="column actions">
+      <div class="column-header">
+        Actions
+        <span class="count" id="actions-count">0</span>
+      </div>
+      <div class="column-content" id="actions-column"></div>
+    </div>
+
+    <svg class="connections-overlay" id="connections"></svg>
+  </div>
+
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-panel-header">
+      <h2 id="detail-title">Entity Details</h2>
+      <button class="detail-panel-close" onclick="closeDetailPanel()">&times;</button>
+    </div>
+    <div class="detail-panel-content" id="detail-content">
+    </div>
+  </div>
+
+  <script src="/js/board.js"></script>
+</body>
+</html>

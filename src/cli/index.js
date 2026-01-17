@@ -14,6 +14,13 @@ import { reopenCommand } from './commands/reopen.js';
 import { assignCommand } from './commands/assign.js';
 import { statsCommand } from './commands/stats.js';
 import { serveCommand } from './commands/serve.js';
+// New 4-column model commands
+import { goalCommand } from './commands/goal.js';
+import { problemCommand } from './commands/problem.js';
+import { ideaCommand, supportCommand } from './commands/idea.js';
+import { actionCommand } from './commands/action.js';
+import { linkCommand, unlinkCommand, relationsCommand } from './commands/link.js';
+import { classifyCommand, similarCommand, duplicatesCommand, insightsCommand } from './commands/classify.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgPath = join(__dirname, '../../package.json');
@@ -91,6 +98,28 @@ export function run(argv) {
 
   // Web server
   program.addCommand(serveCommand());
+
+  // ========== 4-Column Model Commands ==========
+
+  // Entity creation commands
+  program.addCommand(goalCommand());
+  program.addCommand(problemCommand());
+  program.addCommand(ideaCommand());
+  program.addCommand(actionCommand());
+
+  // Relationship commands
+  program.addCommand(linkCommand());
+  program.addCommand(unlinkCommand());
+  program.addCommand(relationsCommand());
+
+  // Support command
+  program.addCommand(supportCommand());
+
+  // AI commands
+  program.addCommand(classifyCommand());
+  program.addCommand(similarCommand());
+  program.addCommand(duplicatesCommand());
+  program.addCommand(insightsCommand());
 
   program.parse(argv);
 }

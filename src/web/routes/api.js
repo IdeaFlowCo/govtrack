@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import * as government from '../../core/government.js';
 import * as issue from '../../core/issue.js';
+import * as entity from '../../core/entity.js';
+import * as relation from '../../core/relation.js';
+import * as ai from '../../core/ai.js';
 
 /**
  * Create API router
@@ -295,6 +298,415 @@ export function createApiRouter(dataDir) {
         by_priority: byPriority
       }
     });
+  }));
+
+  // ============== ENTITIES (4-Column Model) ==============
+
+  // List all entities
+  router.get('/entities', asyncHandler(async (req, res) => {
+    const filters = {};
+    if (req.query.type) filters.type = req.query.type;
+    if (req.query.gov_id) filters.gov_id = req.query.gov_id;
+    if (req.query.unfiled === 'true') filters.unfiled = true;
+    if (req.query.status) filters.status = req.query.status;
+    if (req.query.priority !== undefined) filters.priority = parseInt(req.query.priority, 10);
+    if (req.query.sort) filters.sort = req.query.sort;
+    if (req.query.order) filters.order = req.query.order;
+
+    const limit = parseInt(req.query.limit, 10) || 100;
+    const offset = parseInt(req.query.offset, 10) || 0;
+    filters.limit = Math.min(limit, 500);
+    filters.offset = offset;
+
+    const entities = entity.list(dataDir, filters);
+
+    // Enrich with government info
+    const govCache = {};
+    const enriched = entities.map(ent => {
+      let gov = null;
+      if (ent.gov_id) {
+        if (!govCache[ent.gov_id]) {
+          govCache[ent.gov_id] = government.find(dataDir, ent.gov_id);
+        }
+        gov = govCache[ent.gov_id];
+      }
+      return {
+        ...ent,
+        government: gov ? { id: gov.id, slug: gov.slug, name: gov.name } : null
+      };
+    });
+
+    res.json({
+      success: true,
+      data: { entities: enriched, total: enriched.length, limit, offset }
+    });
+  }));
+
+  // Get single entity
+  router.get('/entities/:id', asyncHandler(async (req, res) => {
+    const ent = entity.find(dataDir, req.params.id);
+    if (!ent) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: `Entity not found: ${req.params.id}` }
+      });
+    }
+
+    let gov = null;
+    if (ent.gov_id) {
+      gov = government.find(dataDir, ent.gov_id);
+    }
+
+    // Get relations info
+    const rels = relation.getRelations(dataDir, req.params.id);
+
+    res.json({
+      success: true,
+      data: {
+        ...ent,
+        government: gov ? { id: gov.id, slug: gov.slug, name: gov.name } : null,
+        relationsInfo: rels
+      }
+    });
+  }));
+
+  // Create entity
+  router.post('/entities', asyncHandler(async (req, res) => {
+    try {
+      const { type, ...data } = req.body;
+      if (!type) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'Entity type is required' }
+        });
+      }
+      const ent = entity.create(dataDir, type, data);
+      res.status(201).json({ success: true, data: ent });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: err.message }
+      });
+    }
+  }));
+
+  // Update entity
+  router.patch('/entities/:id', asyncHandler(async (req, res) => {
+    try {
+      const ent = entity.update(dataDir, req.params.id, req.body);
+      if (!ent) {
+        return res.status(404).json({
+          success: false,
+          error: { code: 'NOT_FOUND', message: `Entity not found: ${req.params.id}` }
+        });
+      }
+      res.json({ success: true, data: ent });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: err.message }
+      });
+    }
+  }));
+
+  // Delete entity
+  router.delete('/entities/:id', asyncHandler(async (req, res) => {
+    const deleted = entity.remove(dataDir, req.params.id);
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: `Entity not found: ${req.params.id}` }
+      });
+    }
+    res.json({ success: true, data: { deleted: req.params.id } });
+  }));
+
+  // ============== ENTITY TYPE SHORTCUTS ==============
+
+  // Goals
+  router.get('/goals', asyncHandler(async (req, res) => {
+    const filters = { type: 'goal' };
+    if (req.query.status) filters.status = req.query.status;
+    if (req.query.gov_id) filters.gov_id = req.query.gov_id;
+    const goals = entity.list(dataDir, filters);
+    res.json({ success: true, data: { goals, total: goals.length } });
+  }));
+
+  router.post('/goals', asyncHandler(async (req, res) => {
+    try {
+      const goal = entity.create(dataDir, 'goal', req.body);
+      res.status(201).json({ success: true, data: goal });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: err.message }
+      });
+    }
+  }));
+
+  // Problems
+  router.get('/problems', asyncHandler(async (req, res) => {
+    const filters = { type: 'problem' };
+    if (req.query.status) filters.status = req.query.status;
+    if (req.query.gov_id) filters.gov_id = req.query.gov_id;
+    const problems = entity.list(dataDir, filters);
+    res.json({ success: true, data: { problems, total: problems.length } });
+  }));
+
+  router.post('/problems', asyncHandler(async (req, res) => {
+    try {
+      const problem = entity.create(dataDir, 'problem', req.body);
+      res.status(201).json({ success: true, data: problem });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: err.message }
+      });
+    }
+  }));
+
+  // Ideas
+  router.get('/ideas', asyncHandler(async (req, res) => {
+    const filters = { type: 'idea' };
+    if (req.query.status) filters.status = req.query.status;
+    if (req.query.gov_id) filters.gov_id = req.query.gov_id;
+    const ideas = entity.list(dataDir, filters);
+    res.json({ success: true, data: { ideas, total: ideas.length } });
+  }));
+
+  router.post('/ideas', asyncHandler(async (req, res) => {
+    try {
+      const idea = entity.create(dataDir, 'idea', req.body);
+      res.status(201).json({ success: true, data: idea });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: err.message }
+      });
+    }
+  }));
+
+  // Support an idea
+  router.post('/ideas/:id/support', asyncHandler(async (req, res) => {
+    try {
+      const supporterId = req.body.user || 'anonymous';
+      const updated = entity.addSupport(dataDir, req.params.id, supporterId);
+      res.json({ success: true, data: updated });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: err.message }
+      });
+    }
+  }));
+
+  // Actions
+  router.get('/actions', asyncHandler(async (req, res) => {
+    const filters = { type: 'action' };
+    if (req.query.status) filters.status = req.query.status;
+    if (req.query.gov_id) filters.gov_id = req.query.gov_id;
+    const actions = entity.list(dataDir, filters);
+    res.json({ success: true, data: { actions, total: actions.length } });
+  }));
+
+  router.post('/actions', asyncHandler(async (req, res) => {
+    try {
+      const action = entity.create(dataDir, 'action', req.body);
+      res.status(201).json({ success: true, data: action });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: err.message }
+      });
+    }
+  }));
+
+  // ============== RELATIONS ==============
+
+  // Get relations for an entity
+  router.get('/entities/:id/relations', asyncHandler(async (req, res) => {
+    try {
+      const rels = relation.getRelations(dataDir, req.params.id);
+      res.json({ success: true, data: rels });
+    } catch (err) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: err.message }
+      });
+    }
+  }));
+
+  // Add a relation
+  router.post('/entities/:id/relations', asyncHandler(async (req, res) => {
+    try {
+      const { type, target } = req.body;
+      if (!type || !target) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'Relation type and target are required' }
+        });
+      }
+      const updated = relation.link(dataDir, req.params.id, type, target);
+      res.status(201).json({ success: true, data: updated });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: err.message }
+      });
+    }
+  }));
+
+  // Remove a relation
+  router.delete('/entities/:id/relations', asyncHandler(async (req, res) => {
+    try {
+      const { type, target } = req.body;
+      if (!type || !target) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'Relation type and target are required' }
+        });
+      }
+      const updated = relation.unlink(dataDir, req.params.id, type, target);
+      res.json({ success: true, data: updated });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: err.message }
+      });
+    }
+  }));
+
+  // ============== GRAPH ==============
+
+  // Get graph data for visualization
+  router.get('/graph', asyncHandler(async (req, res) => {
+    const filters = {};
+    if (req.query.type) filters.type = req.query.type;
+    if (req.query.gov_id) filters.gov_id = req.query.gov_id;
+    if (req.query.status) filters.status = req.query.status;
+
+    const graphData = entity.getGraphData(dataDir, filters);
+
+    // Add government info to nodes
+    const govCache = {};
+    graphData.nodes = graphData.nodes.map(node => {
+      let gov = null;
+      if (node.gov_id) {
+        if (!govCache[node.gov_id]) {
+          govCache[node.gov_id] = government.find(dataDir, node.gov_id);
+        }
+        gov = govCache[node.gov_id];
+      }
+      return {
+        ...node,
+        government: gov ? { id: gov.id, slug: gov.slug, name: gov.name } : null
+      };
+    });
+
+    res.json({ success: true, data: graphData });
+  }));
+
+  // Get dependency graph for a specific entity
+  router.get('/graph/dependencies/:id', asyncHandler(async (req, res) => {
+    try {
+      const graphData = relation.getDependencyGraph(dataDir, req.params.id);
+      res.json({ success: true, data: graphData });
+    } catch (err) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: err.message }
+      });
+    }
+  }));
+
+  // ============== ENTITY STATS ==============
+
+  router.get('/entities/stats', asyncHandler(async (req, res) => {
+    const govId = req.query.gov_id || null;
+    const counts = entity.getCounts(dataDir, govId);
+    res.json({ success: true, data: counts });
+  }));
+
+  // ============== AI FEATURES ==============
+
+  // Classify text and suggest entity type
+  router.post('/classify', asyncHandler(async (req, res) => {
+    try {
+      const { text } = req.body;
+      if (!text) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'Text is required' }
+        });
+      }
+      const suggestion = ai.suggestEntity(text);
+      res.json({ success: true, data: suggestion });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'AI_ERROR', message: err.message }
+      });
+    }
+  }));
+
+  // Find similar ideas
+  router.get('/ideas/similar', asyncHandler(async (req, res) => {
+    try {
+      const { text, threshold = 0.3, limit = 5 } = req.query;
+      if (!text) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'Text query parameter is required' }
+        });
+      }
+      const similar = ai.findSimilarIdeas(dataDir, text, parseFloat(threshold), parseInt(limit, 10));
+      res.json({ success: true, data: { similar } });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'AI_ERROR', message: err.message }
+      });
+    }
+  }));
+
+  // Find duplicates for an idea
+  router.get('/ideas/:id/duplicates', asyncHandler(async (req, res) => {
+    try {
+      const threshold = parseFloat(req.query.threshold) || 0.5;
+      const duplicates = ai.findDuplicates(dataDir, req.params.id, threshold);
+      res.json({ success: true, data: { duplicates } });
+    } catch (err) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: err.message }
+      });
+    }
+  }));
+
+  // Get AI insights for an entity
+  router.get('/entities/:id/insights', asyncHandler(async (req, res) => {
+    try {
+      const insights = ai.getInsights(dataDir, req.params.id);
+      res.json({ success: true, data: insights });
+    } catch (err) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: err.message }
+      });
+    }
+  }));
+
+  // Categorize an idea
+  router.get('/ideas/:id/categorize', asyncHandler(async (req, res) => {
+    try {
+      const categorization = ai.categorizeIdea(dataDir, req.params.id);
+      res.json({ success: true, data: categorization });
+    } catch (err) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: err.message }
+      });
+    }
   }));
 
   return router;

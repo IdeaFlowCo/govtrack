@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GovTrack - Graph Explorer</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: white;
+      overflow: hidden;
+    }
+
+    .header {
+      background: #16213e;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .header nav a {
+      color: #888;
+      text-decoration: none;
+      margin-left: 1.5rem;
+    }
+
+    .header nav a:hover,
+    .header nav a.active {
+      color: white;
+    }
+
+    .graph-container {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    #graph {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Node styling */
+    .node {
+      cursor: pointer;
+    }
+
+    .node circle {
+      stroke: white;
+      stroke-width: 2;
+    }
+
+    .node.goal circle { fill: #4CAF50; }
+    .node.problem circle { fill: #f44336; }
+    .node.idea circle { fill: #2196F3; }
+    .node.action circle { fill: #FF9800; }
+
+    .node.dimmed circle {
+      opacity: 0.2;
+    }
+
+    .node.highlighted circle {
+      stroke-width: 4;
+      stroke: #fff;
+    }
+
+    .node-label {
+      font-size: 12px;
+      fill: white;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    .node.dimmed .node-label {
+      opacity: 0.2;
+    }
+
+    /* Link styling */
+    .link {
+      stroke-opacity: 0.4;
+      stroke-width: 2;
+    }
+
+    .link.threatens { stroke: #f44336; }
+    .link.addresses { stroke: #2196F3; }
+    .link.pursues { stroke: #4CAF50; }
+    .link.implements { stroke: #FF9800; }
+    .link.depends_on { stroke: #9C27B0; stroke-dasharray: 4; }
+    .link.complements { stroke: #00BCD4; }
+    .link.conflicts { stroke: #E91E63; }
+    .link.requires { stroke: #795548; }
+
+    .link.dimmed {
+      stroke-opacity: 0.1;
+    }
+
+    .link.highlighted {
+      stroke-opacity: 0.8;
+      stroke-width: 3;
+    }
+
+    /* Arrow markers */
+    .arrow {
+      fill: #888;
+    }
+
+    /* Controls panel */
+    .controls {
+      position: fixed;
+      top: 80px;
+      left: 20px;
+      background: rgba(22, 33, 62, 0.9);
+      padding: 1rem;
+      border-radius: 8px;
+      z-index: 50;
+      min-width: 200px;
+    }
+
+    .controls h3 {
+      margin: 0 0 1rem 0;
+      font-size: 0.9rem;
+      color: #888;
+      text-transform: uppercase;
+    }
+
+    .controls label {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .controls select,
+    .controls input[type="range"] {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.3rem;
+      background: #1a1a2e;
+      border: 1px solid #444;
+      color: white;
+      border-radius: 4px;
+    }
+
+    .controls input[type="checkbox"] {
+      margin-right: 0.5rem;
+    }
+
+    /* Legend */
+    .legend {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(22, 33, 62, 0.9);
+      padding: 1rem;
+      border-radius: 8px;
+      z-index: 50;
+    }
+
+    .legend h3 {
+      margin: 0 0 0.75rem 0;
+      font-size: 0.9rem;
+      color: #888;
+      text-transform: uppercase;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+
+    .legend-color.goal { background: #4CAF50; }
+    .legend-color.problem { background: #f44336; }
+    .legend-color.idea { background: #2196F3; }
+    .legend-color.action { background: #FF9800; }
+
+    /* Info panel */
+    .info-panel {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background: rgba(22, 33, 62, 0.95);
+      padding: 1rem;
+      border-radius: 8px;
+      z-index: 50;
+      width: 300px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      display: none;
+    }
+
+    .info-panel.open {
+      display: block;
+    }
+
+    .info-panel h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1rem;
+    }
+
+    .info-panel-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .info-section {
+      margin-bottom: 1rem;
+    }
+
+    .info-section h3 {
+      font-size: 0.8rem;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-section p {
+      margin: 0.25rem 0;
+      font-size: 0.85rem;
+    }
+
+    .relation-item {
+      padding: 0.4rem;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      margin-bottom: 0.25rem;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .relation-item:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* Type band labels */
+    .band-label {
+      fill: rgba(255,255,255,0.2);
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>GovTrack Graph</h1>
+    <nav>
+      <a href="/">Dashboard</a>
+      <a href="/board">Board</a>
+      <a href="/graph" class="active">Graph</a>
+    </nav>
+  </div>
+
+  <div class="graph-container">
+    <svg id="graph"></svg>
+  </div>
+
+  <div class="controls">
+    <h3>Filters</h3>
+    <label>Government:
+      <select id="gov-filter">
+        <option value="">All</option>
+      </select>
+    </label>
+    <label>
+      <input type="checkbox" id="show-labels" checked>
+      Show labels
+    </label>
+    <label>
+      <input type="checkbox" id="use-bands" checked>
+      Group by type (bands)
+    </label>
+    <label>Node size:
+      <input type="range" id="node-size" min="10" max="40" value="20">
+    </label>
+    <label>Link distance:
+      <input type="range" id="link-distance" min="50" max="300" value="150">
+    </label>
+  </div>
+
+  <div class="legend">
+    <h3>Entity Types</h3>
+    <div class="legend-item"><span class="legend-color goal"></span> Goals</div>
+    <div class="legend-item"><span class="legend-color problem"></span> Problems</div>
+    <div class="legend-item"><span class="legend-color idea"></span> Ideas</div>
+    <div class="legend-item"><span class="legend-color action"></span> Actions</div>
+  </div>
+
+  <div class="info-panel" id="info-panel">
+    <button class="info-panel-close" onclick="closeInfoPanel()">&times;</button>
+    <h2 id="info-title">Entity Details</h2>
+    <div id="info-content"></div>
+  </div>
+
+  <script src="/js/graph.js"></script>
+</body>
+</html>

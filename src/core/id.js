@@ -1,6 +1,56 @@
 import { createHash, randomBytes } from 'crypto';
 
 /**
+ * Entity type prefixes for the 4-column model
+ */
+export const ENTITY_PREFIXES = {
+  goal: 'gg',
+  problem: 'gp',
+  idea: 'gd',
+  action: 'ga',
+  government: 'gt',
+  issue: 'gi'  // Legacy support
+};
+
+/**
+ * Reverse mapping: prefix -> entity type
+ */
+const PREFIX_TO_TYPE = Object.fromEntries(
+  Object.entries(ENTITY_PREFIXES).map(([type, prefix]) => [prefix, type])
+);
+
+/**
+ * Get entity type from ID prefix
+ * @param {string} id - Entity ID (e.g., 'gg-a1b2')
+ * @returns {string|null} Entity type or null if invalid
+ */
+export function getTypeFromId(id) {
+  if (!id || typeof id !== 'string') return null;
+  const match = id.match(/^([a-z]{2})-/);
+  if (!match) return null;
+  return PREFIX_TO_TYPE[match[1]] || null;
+}
+
+/**
+ * Get the prefix for a given entity type
+ * @param {string} type - Entity type (e.g., 'goal', 'problem')
+ * @returns {string} Prefix for the type
+ */
+export function getPrefixForType(type) {
+  return ENTITY_PREFIXES[type] || 'ge'; // 'ge' for generic entity
+}
+
+/**
+ * Check if an ID belongs to a specific entity type
+ * @param {string} id - Entity ID
+ * @param {string} type - Expected entity type
+ * @returns {boolean} True if ID matches type
+ */
+export function isEntityType(id, type) {
+  return getTypeFromId(id) === type;
+}
+
+/**
  * Generate a unique ID with the given prefix
  * @param {string} prefix - ID prefix (e.g., 'gt' for government, 'gi' for issue)
  * @param {Object} inputs - Data to include in hash

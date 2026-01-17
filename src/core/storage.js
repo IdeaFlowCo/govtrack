@@ -164,3 +164,59 @@ export function isUnique(filePath, field, value, excludeId = null) {
   const records = readAll(filePath);
   return !records.some(r => r[field] === value && r.id !== excludeId);
 }
+
+/**
+ * Find records by relation target
+ * Searches for records that have a relation pointing to the target ID
+ * @param {string} filePath - Path to JSONL file
+ * @param {string} targetId - Target ID to search for in relations
+ * @param {string} [relationType] - Optional relation type filter
+ * @returns {Array} Records with matching relations
+ */
+export function findByRelation(filePath, targetId, relationType = null) {
+  const records = readAll(filePath);
+  return records.filter(record => {
+    if (!record.relations || !Array.isArray(record.relations)) {
+      return false;
+    }
+    return record.relations.some(rel => {
+      if (rel.target !== targetId) return false;
+      if (relationType && rel.type !== relationType) return false;
+      return true;
+    });
+  });
+}
+
+/**
+ * Find records by entity type field
+ * @param {string} filePath - Path to JSONL file
+ * @param {string} entityType - Entity type (goal, problem, idea, action)
+ * @returns {Array} Records with matching type
+ */
+export function findByType(filePath, entityType) {
+  const records = readAll(filePath);
+  return records.filter(record => record.type === entityType);
+}
+
+/**
+ * Find records that have relations to a specific target
+ * Returns both the record and the matching relations
+ * @param {string} filePath - Path to JSONL file
+ * @param {string} targetId - Target ID to search for
+ * @returns {Array<{record: Object, relations: Array}>} Records with their matching relations
+ */
+export function findRelationsTo(filePath, targetId) {
+  const records = readAll(filePath);
+  const results = [];
+
+  for (const record of records) {
+    if (!record.relations || !Array.isArray(record.relations)) continue;
+
+    const matchingRelations = record.relations.filter(rel => rel.target === targetId);
+    if (matchingRelations.length > 0) {
+      results.push({ record, relations: matchingRelations });
+    }
+  }
+
+  return results;
+}
