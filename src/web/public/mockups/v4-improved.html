@@ -1854,6 +1854,7 @@
               <span class="profile-stat"><strong>24</strong> submissions</span>
               <span class="profile-stat"><strong>156</strong> supported</span>
               <span class="profile-stat"><strong>89</strong> comments</span>
+              <span class="profile-stat"><strong>12</strong> mentions</span>
             </div>
           </div>
         </div>
@@ -1861,8 +1862,10 @@
           <div class="type-tab active">Submissions</div>
           <div class="type-tab">Supported</div>
           <div class="type-tab">Comments</div>
+          <div class="type-tab">Mentions</div>
         </div>
 
+        <!-- Submissions Tab Content (shown by default) -->
         <div class="entity-card">
           <div class="entity-card-header">
             <span class="entity-type-badge idea">Idea</span>
@@ -1875,6 +1878,68 @@
           <div class="entity-actions">
             <span class="entity-action">💬 12</span>
             <span class="entity-action support">👍 67</span>
+          </div>
+        </div>
+
+        <!-- Mentions Tab Content (would show when Mentions tab is active) -->
+        <div style="display: none;" class="mentions-tab-content">
+          <div class="entity-card">
+            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+              <div class="avatar small">SR</div>
+              <div style="flex: 1;">
+                <div style="font-size: 0.9rem; margin-bottom: 4px;">
+                  <strong>Sarah R</strong> <span style="color: var(--text-secondary);">@sarahsf · 3h</span>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 0.85rem;">mentioned you in a comment</div>
+              </div>
+            </div>
+            <div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent); margin-bottom: 12px;">
+              "Great idea! <span style="color: var(--accent);">@janedoe</span> didn't you mention working on something like this?"
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="entity-type-badge idea">Idea</span>
+              <span style="font-weight: 600;">AI-powered pothole detection</span>
+            </div>
+          </div>
+
+          <div class="entity-card">
+            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+              <div class="avatar small" style="background: #1565c0;">SF</div>
+              <div style="flex: 1;">
+                <div style="font-size: 0.9rem; margin-bottom: 4px;">
+                  <strong>SF Public Works</strong>
+                  <span style="background: var(--idea-color); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; margin-left: 4px;">OFFICIAL</span>
+                  <span style="color: var(--text-secondary);"> · 1d</span>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 0.85rem;">mentioned you in a response</div>
+              </div>
+            </div>
+            <div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; border-left: 3px solid var(--idea-color); margin-bottom: 12px;">
+              "Thanks for reporting. <span style="color: var(--accent);">@janedoe</span> we've dispatched a crew."
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="entity-type-badge problem">Problem</span>
+              <span style="font-weight: 600;">Dangerous pothole at Market & 5th</span>
+            </div>
+          </div>
+
+          <div class="entity-card">
+            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+              <div class="avatar small">MC</div>
+              <div style="flex: 1;">
+                <div style="font-size: 0.9rem; margin-bottom: 4px;">
+                  <strong>Mike Chen</strong> <span style="color: var(--text-secondary);">@mikec · 2d</span>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 0.85rem;">mentioned you in a comment</div>
+              </div>
+            </div>
+            <div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent); margin-bottom: 12px;">
+              "<span style="color: var(--accent);">@janedoe</span> Have you seen the new camera specs?"
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="entity-type-badge idea">Idea</span>
+              <span style="font-weight: 600;">Citizen-reported hazard app</span>
+            </div>
           </div>
         </div>
       </div>
