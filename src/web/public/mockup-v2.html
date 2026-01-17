@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GovTrack - Twitter-Style UI Mockup</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #000;
+      color: #e7e9ea;
+      min-height: 100vh;
+    }
+
+    /* Layout */
+    .app-container {
+      display: flex;
+      max-width: 1300px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+
+    /* Left Sidebar */
+    .left-sidebar {
+      width: 275px;
+      padding: 0 12px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo {
+      padding: 12px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #e94560;
+    }
+
+    .nav-menu {
+      margin-top: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 12px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #e7e9ea;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .nav-item:hover {
+      background: #181818;
+    }
+
+    .nav-item.active {
+      font-weight: 700;
+    }
+
+    .nav-item svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .nav-badge {
+      background: #e94560;
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .capture-btn {
+      background: #e94560;
+      color: white;
+      border: none;
+      padding: 16px 0;
+      border-radius: 30px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 16px;
+      width: 90%;
+    }
+
+    .capture-btn:hover {
+      background: #d63d56;
+    }
+
+    .user-widget {
+      margin-top: auto;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .user-widget:hover {
+      background: #181818;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e94560;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: white;
+    }
+
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .user-handle {
+      color: #71767b;
+      font-size: 0.9rem;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      max-width: 600px;
+      border-left: 1px solid #2f3336;
+      border-right: 1px solid #2f3336;
+      min-height: 100vh;
+    }
+
+    .page-header {
+      padding: 16px;
+      border-bottom: 1px solid #2f3336;
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(12px);
+      z-index: 10;
+    }
+
+    .page-header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .page-header-subtitle {
+      font-size: 0.8rem;
+      color: #71767b;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #2f3336;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      color: #71767b;
+      font-weight: 500;
+      border: none;
+      background: none;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .tab:hover {
+      background: #181818;
+    }
+
+    .tab.active {
+      color: #e7e9ea;
+      font-weight: 700;
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 56px;
+      height: 4px;
+      background: #e94560;
+      border-radius: 2px;
+    }
+
+    /* Post/Issue Card */
+    .post {
+      padding: 16px;
+      border-bottom: 1px solid #2f3336;
+      display: flex;
+      gap: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .post:hover {
+      background: #080808;
+    }
+
+    .post-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #333;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .post-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .post-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .post-name {
+      font-weight: 700;
+    }
+
+    .post-handle {
+      color: #71767b;
+    }
+
+    .post-time {
+      color: #71767b;
+    }
+
+    .post-time::before {
+      content: '·';
+      margin: 0 4px;
+    }
+
+    .post-badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .post-badge.problem { background: #ff4757; color: white; }
+    .post-badge.idea { background: #3498db; color: white; }
+    .post-badge.action { background: #ffa502; color: #000; }
+    .post-badge.goal { background: #2ed573; color: #000; }
+    .post-badge.staff { background: #333; color: #71767b; }
+
+    .post-text {
+      margin-top: 4px;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    .post-location {
+      margin-top: 8px;
+      color: #71767b;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .post-image {
+      margin-top: 12px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #2f3336;
+    }
+
+    .post-image img {
+      width: 100%;
+      display: block;
+    }
+
+    .post-image-placeholder {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #71767b;
+      font-size: 0.85rem;
+    }
+
+    .post-tags {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .post-tag {
+      background: #1d2d3d;
+      color: #1d9bf0;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 0.85rem;
+    }
+
+    .post-actions {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      max-width: 425px;
+    }
+
+    .post-action {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #71767b;
+      cursor: pointer;
+      padding: 8px;
+      margin: -8px;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .post-action:hover {
+      color: #e94560;
+    }
+
+    .post-action:hover svg {
+      background: rgba(233, 69, 96, 0.1);
+      border-radius: 50%;
+    }
+
+    .post-action svg {
+      width: 18px;
+      height: 18px;
+      padding: 8px;
+      box-sizing: content-box;
+    }
+
+    .post-action.liked { color: #f91880; }
+    .post-action.supported { color: #2ed573; }
+
+    /* Right Sidebar */
+    .right-sidebar {
+      width: 350px;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .search-box {
+      margin-top: 8px;
+      background: #202327;
+      border-radius: 30px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .search-box input {
+      background: none;
+      border: none;
+      color: #e7e9ea;
+      font-size: 0.95rem;
+      flex: 1;
+      outline: none;
+    }
+
+    .search-box input::placeholder {
+      color: #71767b;
+    }
+
+    .sidebar-card {
+      background: #16181c;
+      border-radius: 16px;
+      margin-top: 16px;
+      overflow: hidden;
+    }
+
+    .sidebar-card-header {
+      padding: 12px 16px;
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .sidebar-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .sidebar-item:hover {
+      background: #1c1f23;
+    }
+
+    .sidebar-item-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .sidebar-item-meta {
+      color: #71767b;
+      font-size: 0.85rem;
+      margin-top: 2px;
+    }
+
+    .sidebar-item-count {
+      color: #71767b;
+      font-size: 0.8rem;
+    }
+
+    .show-more {
+      padding: 16px;
+      color: #e94560;
+      cursor: pointer;
+    }
+
+    .show-more:hover {
+      background: #1c1f23;
+    }
+
+    /* Profile Page */
+    .profile-header {
+      position: relative;
+    }
+
+    .profile-cover {
+      height: 200px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d3a4f 100%);
+      overflow: hidden;
+    }
+
+    .profile-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-cover-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a2744 0%, #0f3460 100%);
+    }
+
+    .profile-avatar-large {
+      width: 134px;
+      height: 134px;
+      border-radius: 50%;
+      border: 4px solid #000;
+      background: #333;
+      position: absolute;
+      bottom: -67px;
+      left: 16px;
+      overflow: hidden;
+    }
+
+    .profile-avatar-large img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      background: #e94560;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .profile-actions {
+      display: flex;
+      justify-content: flex-end;
+      padding: 12px 16px;
+    }
+
+    .profile-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .profile-btn-outline {
+      background: transparent;
+      border: 1px solid #536471;
+      color: #e7e9ea;
+    }
+
+    .profile-info {
+      padding: 16px;
+      padding-top: 68px;
+    }
+
+    .profile-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .profile-handle {
+      color: #71767b;
+    }
+
+    .profile-badge {
+      display: inline-block;
+      background: #333;
+      color: #71767b;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+
+    .profile-bio {
+      margin-top: 12px;
+      line-height: 1.4;
+    }
+
+    .profile-meta {
+      margin-top: 12px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: #71767b;
+      font-size: 0.9rem;
+    }
+
+    .profile-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .profile-stats {
+      margin-top: 12px;
+      display: flex;
+      gap: 20px;
+      font-size: 0.9rem;
+    }
+
+    .profile-stat-num {
+      font-weight: 700;
+      color: #e7e9ea;
+    }
+
+    .profile-stat-label {
+      color: #71767b;
+    }
+
+    /* Government Profile */
+    .gov-stats-row {
+      display: flex;
+      gap: 12px;
+      padding: 0 16px 16px;
+    }
+
+    .gov-stat {
+      flex: 1;
+      background: #16181c;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .gov-stat-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .gov-stat-num.open { color: #ff4757; }
+    .gov-stat-num.progress { color: #ffa502; }
+    .gov-stat-num.resolved { color: #2ed573; }
+
+    .gov-stat-label {
+      font-size: 0.8rem;
+      color: #71767b;
+      margin-top: 4px;
+    }
+
+    /* Compose Modal */
+    .compose-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(91, 112, 131, 0.4);
+      z-index: 100;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 5vh;
+    }
+
+    .compose-modal.active {
+      display: flex;
+    }
+
+    .compose-box {
+      background: #000;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .compose-header {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      height: 53px;
+      border-bottom: 1px solid #2f3336;
+    }
+
+    .compose-close {
+      background: none;
+      border: none;
+      color: #e7e9ea;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 8px;
+      margin: -8px;
+      border-radius: 50%;
+    }
+
+    .compose-close:hover {
+      background: #181818;
+    }
+
+    .compose-content {
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .compose-textarea {
+      flex: 1;
+    }
+
+    .compose-textarea textarea {
+      width: 100%;
+      background: none;
+      border: none;
+      color: #e7e9ea;
+      font-size: 1.2rem;
+      resize: none;
+      outline: none;
+      min-height: 120px;
+    }
+
+    .compose-textarea textarea::placeholder {
+      color: #71767b;
+    }
+
+    .compose-options {
+      padding: 0 16px 16px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .compose-option {
+      padding: 8px 16px;
+      background: #16181c;
+      border: 1px solid #2f3336;
+      border-radius: 20px;
+      color: #71767b;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .compose-option:hover {
+      background: #1c1f23;
+    }
+
+    .compose-option.selected {
+      background: #1d2d3d;
+      border-color: #1d9bf0;
+      color: #1d9bf0;
+    }
+
+    .compose-footer {
+      padding: 12px 16px;
+      border-top: 1px solid #2f3336;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .compose-tools {
+      display: flex;
+      gap: 4px;
+    }
+
+    .compose-tool {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #e94560;
+    }
+
+    .compose-tool:hover {
+      background: rgba(233, 69, 96, 0.1);
+    }
+
+    .compose-submit {
+      background: #e94560;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .compose-submit:hover {
+      background: #d63d56;
+    }
+
+    /* Page visibility */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* Hide things for page map */
+    .page-map {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: #16181c;
+      border-radius: 16px;
+      padding: 16px;
+      width: 200px;
+      z-index: 50;
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #2f3336;
+    }
+
+    .page-map h4 {
+      color: #71767b;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .page-map a {
+      display: block;
+      color: #e7e9ea;
+      text-decoration: none;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 2px;
+    }
+
+    .page-map a:hover {
+      background: #1c1f23;
+    }
+
+    .page-map a.current {
+      background: rgba(233, 69, 96, 0.2);
+      color: #e94560;
+    }
+
+    .page-map .section-label {
+      color: #71767b;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      margin-top: 12px;
+      margin-bottom: 4px;
+      padding-left: 8px;
+    }
+
+    /* Notification dot */
+    .notif-dot {
+      width: 8px;
+      height: 8px;
+      background: #e94560;
+      border-radius: 50%;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Left Sidebar -->
+    <nav class="left-sidebar">
+      <div class="logo">GovTrack</div>
+
+      <div class="nav-menu">
+        <a href="#" class="nav-item active" onclick="showPage('home')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.696L.622 8.807l1.06 1.696L3 9.679V19.5C3 20.881 4.119 22 5.5 22h13c1.381 0 2.5-1.119 2.5-2.5V9.679l1.318.824 1.06-1.696L12 1.696zM12 16.5c-1.933 0-3.5-1.567-3.5-3.5s1.567-3.5 3.5-3.5 3.5 1.567 3.5 3.5-1.567 3.5-3.5 3.5z"/></svg>
+          Home
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('explore')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.25 3.75c-3.59 0-6.5 2.91-6.5 6.5s2.91 6.5 6.5 6.5c1.795 0 3.419-.726 4.596-1.904 1.178-1.177 1.904-2.801 1.904-4.596 0-3.59-2.91-6.5-6.5-6.5zm-8.5 6.5c0-4.694 3.806-8.5 8.5-8.5s8.5 3.806 8.5 8.5c0 1.986-.682 3.815-1.824 5.262l4.781 4.781-1.414 1.414-4.781-4.781c-1.447 1.142-3.276 1.824-5.262 1.824-4.694 0-8.5-3.806-8.5-8.5z"/></svg>
+          Explore
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('notifications')" style="position:relative">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.993 9.042C19.48 5.017 16.054 2 11.996 2s-7.49 3.021-7.999 7.051L2.866 18H7.1c.463 2.282 2.481 4 4.9 4s4.437-1.718 4.9-4h4.236l-1.143-8.958zM12 20c-1.306 0-2.417-.835-2.829-2h5.658c-.412 1.165-1.523 2-2.829 2zm-6.866-4l.847-6.698C6.364 6.272 8.941 4 11.996 4s5.627 2.268 6.013 5.295L18.864 16H5.134z"/></svg>
+          Notifications
+          <span class="nav-badge">5</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('my-issues')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.998 5.5c0-1.381 1.119-2.5 2.5-2.5h15c1.381 0 2.5 1.119 2.5 2.5v13c0 1.381-1.119 2.5-2.5 2.5h-15c-1.381 0-2.5-1.119-2.5-2.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v2.764l8 3.638 8-3.636V5.5c0-.276-.224-.5-.5-.5h-15zm15.5 5.463l-8 3.636-8-3.638V18.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5v-8.037z"/></svg>
+          My Issues
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('board')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h6v6H3V3zm0 8h6v10H3V11zm8-8h10v10H11V3zm0 12h10v6H11v-6z"/></svg>
+          Board
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('heatmap')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          Heatmap
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('profile')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5.651 19h12.698c-.337-1.8-1.023-3.21-1.945-4.19C15.318 13.65 13.838 13 12 13s-3.317.65-4.404 1.81c-.922.98-1.608 2.39-1.945 4.19zm.486-5.56C7.627 11.85 9.648 11 12 11s4.373.85 5.863 2.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H3.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46zM12 4c-1.105 0-2 .9-2 2s.895 2 2 2 2-.9 2-2-.895-2-2-2zM8 6c0-2.21 1.791-4 4-4s4 1.79 4 4-1.791 4-4 4-4-1.79-4-4z"/></svg>
+          Profile
+        </a>
+      </div>
+
+      <button class="capture-btn" onclick="openCompose()">Report Issue</button>
+
+      <div class="user-widget" onclick="showPage('profile')">
+        <div class="user-avatar">JD</div>
+        <div class="user-info">
+          <div class="user-name">Jane Doe</div>
+          <div class="user-handle">@jane_doe</div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- ============ HOME FEED ============ -->
+      <div class="page active" id="page-home">
+        <div class="page-header">
+          <h1>Home</h1>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active">For you</button>
+          <button class="tab">Following</button>
+          <button class="tab">Springfield</button>
+        </div>
+
+        <!-- Feed posts -->
+        <div class="post" onclick="showPage('issue-detail')">
+          <div class="post-avatar">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="">
+          </div>
+          <div class="post-content">
+            <div class="post-header">
+              <span class="post-name">Mike Smith</span>
+              <span class="post-handle">@mike_smith</span>
+              <span class="post-time">2h</span>
+              <span class="post-badge problem">Problem</span>
+            </div>
+            <div class="post-text">
+              Large pothole on Main Street near the library. Been here for 2 weeks and getting worse. Several cars have hit it. @springfield_gov please fix this!
+            </div>
+            <div class="post-location">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+              Main Street, Springfield
+            </div>
+            <div class="post-image">
+              <div class="post-image-placeholder">[Photo of pothole]</div>
+            </div>
+            <div class="post-tags">
+              <span class="post-tag">#infrastructure</span>
+              <span class="post-tag">#roads</span>
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01z"/></svg>
+                <span>12</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
+                <span>3</span>
+              </div>
+              <div class="post-action supported">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91z"/></svg>
+                <span>28</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="post" onclick="showPage('issue-detail')">
+          <div class="post-avatar" style="background:#2ed573;display:flex;align-items:center;justify-content:center;color:white;font-weight:600">PW</div>
+          <div class="post-content">
+            <div class="post-header">
+              <span class="post-name">Springfield Public Works</span>
+              <span class="post-handle">@springfield_pw</span>
+              <span class="post-time">1h</span>
+              <span class="post-badge staff">Official</span>
+            </div>
+            <div class="post-text">
+              Update on Main Street pothole: We've scheduled repairs for Monday 1/20. Thank you @mike_smith and @jane_doe for reporting. Crews will be on site 8am-12pm.
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01z"/></svg>
+                <span>5</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
+                <span>8</span>
+              </div>
+              <div class="post-action liked">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91z"/></svg>
+                <span>42</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="post" onclick="showPage('issue-detail')">
+          <div class="post-avatar">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt="">
+          </div>
+          <div class="post-content">
+            <div class="post-header">
+              <span class="post-name">Sarah Jones</span>
+              <span class="post-handle">@sarah_jones</span>
+              <span class="post-time">5h</span>
+              <span class="post-badge idea">Idea</span>
+            </div>
+            <div class="post-text">
+              What if we had a community transit app that shows real-time bus locations? Bus route 7 is always late and overcrowded. Would make a huge difference for commuters! 🚌
+            </div>
+            <div class="post-image">
+              <div class="post-image-placeholder">[Mockup of transit app concept]</div>
+            </div>
+            <div class="post-tags">
+              <span class="post-tag">#transit</span>
+              <span class="post-tag">#publicTransport</span>
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01z"/></svg>
+                <span>24</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
+                <span>15</span>
+              </div>
+              <div class="post-action supported">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91z"/></svg>
+                <span>156</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ USER PROFILE ============ -->
+      <div class="page" id="page-profile">
+        <div class="page-header" style="display:flex;align-items:center;gap:24px">
+          <button onclick="showPage('home')" style="background:none;border:none;color:#e7e9ea;cursor:pointer;padding:8px;margin:-8px;border-radius:50%">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"/></svg>
+          </button>
+          <div>
+            <h1>Jane Doe</h1>
+            <div class="page-header-subtitle">12 issues</div>
+          </div>
+        </div>
+
+        <div class="profile-header">
+          <div class="profile-cover">
+            <div class="profile-cover-placeholder"></div>
+          </div>
+          <div class="profile-avatar-large">
+            <div class="profile-avatar-placeholder">JD</div>
+          </div>
+        </div>
+
+        <div class="profile-actions">
+          <button class="profile-btn profile-btn-outline">Edit profile</button>
+        </div>
+
+        <div class="profile-info">
+          <div class="profile-name">Jane Doe</div>
+          <div class="profile-handle">@jane_doe</div>
+
+          <div class="profile-bio">
+            Springfield resident. Civic engagement enthusiast. Making our community better one issue at a time! 🏘️
+          </div>
+
+          <div class="profile-meta">
+            <span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+              Springfield, IL
+            </span>
+            <span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4V3h2v1h6V3h2v1h1.5C19.89 4 21 5.12 21 6.5v12c0 1.38-1.11 2.5-2.5 2.5h-13C4.12 21 3 19.88 3 18.5v-12C3 5.12 4.12 4 5.5 4H7z"/></svg>
+              Joined January 2024
+            </span>
+          </div>
+
+          <div class="profile-stats">
+            <span><span class="profile-stat-num">24</span> <span class="profile-stat-label">Following</span></span>
+            <span><span class="profile-stat-num">156</span> <span class="profile-stat-label">Followers</span></span>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active">Issues</button>
+          <button class="tab">Replies</button>
+          <button class="tab">Media</button>
+          <button class="tab">Supported</button>
+        </div>
+
+        <!-- User's posts -->
+        <div class="post" onclick="showPage('issue-detail')">
+          <div class="post-avatar">
+            <div style="width:100%;height:100%;background:#e94560;display:flex;align-items:center;justify-content:center;color:white;font-weight:600">JD</div>
+          </div>
+          <div class="post-content">
+            <div class="post-header">
+              <span class="post-name">Jane Doe</span>
+              <span class="post-handle">@jane_doe</span>
+              <span class="post-time">1d</span>
+              <span class="post-badge problem">Problem</span>
+            </div>
+            <div class="post-text">
+              Streetlights out on Oak Avenue between 3rd and 5th street. Very dark and unsafe at night. @springfield_gov
+            </div>
+            <div class="post-location">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+              Oak Avenue, Springfield
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01z"/></svg>
+                <span>8</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
+                <span>2</span>
+              </div>
+              <div class="post-action supported">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91z"/></svg>
+                <span>15</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ GOVERNMENT PROFILE ============ -->
+      <div class="page" id="page-gov">
+        <div class="page-header" style="display:flex;align-items:center;gap:24px">
+          <button onclick="showPage('home')" style="background:none;border:none;color:#e7e9ea;cursor:pointer;padding:8px;margin:-8px;border-radius:50%">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"/></svg>
+          </button>
+          <div>
+            <h1>Springfield</h1>
+            <div class="page-header-subtitle">128 issues</div>
+          </div>
+        </div>
+
+        <div class="profile-header">
+          <div class="profile-cover">
+            <div class="profile-cover-placeholder" style="background:linear-gradient(135deg, #1a5a2e 0%, #2d8a4e 100%)"></div>
+          </div>
+          <div class="profile-avatar-large">
+            <div class="profile-avatar-placeholder" style="background:#2ed573">🏛️</div>
+          </div>
+        </div>
+
+        <div class="profile-actions">
+          <button class="profile-btn profile-btn-outline">Follow</button>
+        </div>
+
+        <div class="profile-info">
+          <div class="profile-name">City of Springfield</div>
+          <div class="profile-handle">@springfield_gov</div>
+          <span class="profile-badge">Official</span>
+
+          <div class="profile-bio">
+            Official GovTrack page for the City of Springfield, Illinois. Report issues, share ideas, and help make our city better!
+          </div>
+
+          <div class="profile-meta">
+            <span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+              Springfield, Illinois
+            </span>
+            <span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4V3h2v1h6V3h2v1h1.5C19.89 4 21 5.12 21 6.5v12c0 1.38-1.11 2.5-2.5 2.5h-13C4.12 21 3 19.88 3 18.5v-12C3 5.12 4.12 4 5.5 4H7z"/></svg>
+              Joined December 2023
+            </span>
+          </div>
+
+          <div class="profile-stats">
+            <span><span class="profile-stat-num">2.4K</span> <span class="profile-stat-label">Followers</span></span>
+          </div>
+        </div>
+
+        <div class="gov-stats-row">
+          <div class="gov-stat">
+            <div class="gov-stat-num open">45</div>
+            <div class="gov-stat-label">Open</div>
+          </div>
+          <div class="gov-stat">
+            <div class="gov-stat-num progress">23</div>
+            <div class="gov-stat-label">In Progress</div>
+          </div>
+          <div class="gov-stat">
+            <div class="gov-stat-num resolved">60</div>
+            <div class="gov-stat-label">Resolved</div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active">Issues</button>
+          <button class="tab">Updates</button>
+          <button class="tab">Goals</button>
+          <button class="tab">Media</button>
+        </div>
+
+        <!-- Government's posts -->
+        <div class="post" onclick="showPage('issue-detail')">
+          <div class="post-avatar" style="background:#2ed573;display:flex;align-items:center;justify-content:center;font-size:1.5rem">🏛️</div>
+          <div class="post-content">
+            <div class="post-header">
+              <span class="post-name">City of Springfield</span>
+              <span class="post-handle">@springfield_gov</span>
+              <span class="post-time">3h</span>
+              <span class="post-badge goal">Goal</span>
+            </div>
+            <div class="post-text">
+              🎯 <strong>2024 City Goal: Safe Streets for All</strong><br><br>
+              We're committed to reducing traffic incidents by 30% this year. This includes: road repairs, improved lighting, new crosswalks, and traffic signal upgrades.
+            </div>
+            <div class="post-image">
+              <div class="post-image-placeholder">[Infographic: Safe Streets Initiative]</div>
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01z"/></svg>
+                <span>34</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
+                <span>89</span>
+              </div>
+              <div class="post-action supported">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91z"/></svg>
+                <span>412</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ EXPLORE ============ -->
+      <div class="page" id="page-explore">
+        <div class="page-header">
+          <div class="search-box" style="margin:0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#71767b"><path d="M10.25 3.75c-3.59 0-6.5 2.91-6.5 6.5s2.91 6.5 6.5 6.5c1.795 0 3.419-.726 4.596-1.904 1.178-1.177 1.904-2.801 1.904-4.596 0-3.59-2.91-6.5-6.5-6.5zm-8.5 6.5c0-4.694 3.806-8.5 8.5-8.5s8.5 3.806 8.5 8.5c0 1.986-.682 3.815-1.824 5.262l4.781 4.781-1.414 1.414-4.781-4.781c-1.447 1.142-3.276 1.824-5.262 1.824-4.694 0-8.5-3.806-8.5-8.5z"/></svg>
+            <input type="text" placeholder="Search issues, ideas, governments...">
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active">Trending</button>
+          <button class="tab">Problems</button>
+          <button class="tab">Ideas</button>
+          <button class="tab">Governments</button>
+        </div>
+
+        <div style="padding:16px;border-bottom:1px solid #2f3336">
+          <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:16px">Trending in Illinois</h3>
+
+          <div style="margin-bottom:16px;cursor:pointer">
+            <div style="color:#71767b;font-size:0.8rem">Trending in Springfield</div>
+            <div style="font-weight:700;margin:4px 0">#MainStreetPotholes</div>
+            <div style="color:#71767b;font-size:0.85rem">234 posts</div>
+          </div>
+
+          <div style="margin-bottom:16px;cursor:pointer">
+            <div style="color:#71767b;font-size:0.8rem">Civic · Trending</div>
+            <div style="font-weight:700;margin:4px 0">#TransitApp</div>
+            <div style="color:#71767b;font-size:0.85rem">156 supporters</div>
+          </div>
+
+          <div style="margin-bottom:16px;cursor:pointer">
+            <div style="color:#71767b;font-size:0.8rem">Infrastructure</div>
+            <div style="font-weight:700;margin:4px 0">Streetlight repairs</div>
+            <div style="color:#71767b;font-size:0.85rem">45 issues this week</div>
+          </div>
+        </div>
+
+        <div style="padding:16px;border-bottom:1px solid #2f3336">
+          <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:16px">Governments to follow</h3>
+
+          <div class="sidebar-item" onclick="showPage('gov')" style="padding:0;display:flex;gap:12px;align-items:center;margin-bottom:12px">
+            <div style="width:48px;height:48px;background:#2ed573;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem">🏛️</div>
+            <div style="flex:1">
+              <div style="font-weight:700">Springfield</div>
+              <div style="color:#71767b;font-size:0.85rem">@springfield_gov</div>
+            </div>
+            <button style="background:#e7e9ea;color:#0f1419;border:none;padding:8px 16px;border-radius:20px;font-weight:700;cursor:pointer">Follow</button>
+          </div>
+
+          <div class="sidebar-item" onclick="showPage('gov')" style="padding:0;display:flex;gap:12px;align-items:center">
+            <div style="width:48px;height:48px;background:#3498db;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem">🏛️</div>
+            <div style="flex:1">
+              <div style="font-weight:700">Shelbyville</div>
+              <div style="color:#71767b;font-size:0.85rem">@shelbyville_gov</div>
+            </div>
+            <button style="background:#e7e9ea;color:#0f1419;border:none;padding:8px 16px;border-radius:20px;font-weight:700;cursor:pointer">Follow</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placeholder pages -->
+      <div class="page" id="page-notifications">
+        <div class="page-header"><h1>Notifications</h1></div>
+        <div class="tabs">
+          <button class="tab active">All</button>
+          <button class="tab">Mentions</button>
+        </div>
+        <div style="padding:40px;text-align:center;color:#71767b">Notification feed with @mentions, replies, status changes...</div>
+      </div>
+
+      <div class="page" id="page-my-issues">
+        <div class="page-header"><h1>My Issues</h1></div>
+        <div class="tabs">
+          <button class="tab active">Posted</button>
+          <button class="tab">Supported</button>
+          <button class="tab">Following</button>
+        </div>
+        <div style="padding:40px;text-align:center;color:#71767b">Your submitted issues and supported ideas...</div>
+      </div>
+
+      <div class="page" id="page-board">
+        <div class="page-header"><h1>Board View</h1></div>
+        <div style="padding:40px;text-align:center;color:#71767b">4-column Kanban board: Goals → Problems → Ideas → Actions</div>
+      </div>
+
+      <div class="page" id="page-heatmap">
+        <div class="page-header"><h1>Issue Heatmap</h1></div>
+        <div style="padding:40px;text-align:center;color:#71767b">Geographic heatmap showing issue density...</div>
+      </div>
+
+      <div class="page" id="page-issue-detail">
+        <div class="page-header" style="display:flex;align-items:center;gap:24px">
+          <button onclick="showPage('home')" style="background:none;border:none;color:#e7e9ea;cursor:pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"/></svg>
+          </button>
+          <h1>Issue</h1>
+        </div>
+
+        <!-- Main Issue -->
+        <div style="padding:16px;border-bottom:1px solid #2f3336">
+          <div style="display:flex;gap:12px">
+            <div class="post-avatar">
+              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="">
+            </div>
+            <div>
+              <div style="display:flex;align-items:center;gap:4px">
+                <span style="font-weight:700">Mike Smith</span>
+                <span style="color:#71767b">@mike_smith</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;font-size:1.4rem;line-height:1.4">
+            Large pothole on Main Street near the library. Been here for 2 weeks and getting worse. Several cars have hit it. @springfield_gov please fix this!
+          </div>
+
+          <div style="margin-top:12px;display:flex;align-items:center;gap:4px;color:#71767b">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+            Main Street, Springfield
+          </div>
+
+          <!-- Issue Image -->
+          <div style="margin-top:16px;border-radius:16px;overflow:hidden;border:1px solid #2f3336">
+            <div style="width:100%;height:300px;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#71767b">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="opacity:0.5;margin-bottom:8px"><path d="M3 5.5C3 4.119 4.119 3 5.5 3h13C19.881 3 21 4.119 21 5.5v13c0 1.381-1.119 2.5-2.5 2.5h-13C4.119 21 3 19.881 3 18.5v-13z"/></svg>
+              [Photo of pothole on Main Street]
+            </div>
+          </div>
+
+          <div style="margin-top:16px;display:flex;gap:8px">
+            <span class="post-tag">#infrastructure</span>
+            <span class="post-tag">#roads</span>
+            <span style="background:#ff4757;color:white;padding:4px 12px;border-radius:16px;font-size:0.85rem">Problem</span>
+          </div>
+
+          <div style="margin-top:16px;padding:16px 0;border-top:1px solid #2f3336;border-bottom:1px solid #2f3336;color:#71767b;font-size:0.95rem">
+            <span>2:34 PM · Jan 17, 2026</span>
+          </div>
+
+          <div style="padding:16px 0;border-bottom:1px solid #2f3336;display:flex;gap:24px;font-size:0.95rem">
+            <span><strong style="color:#e7e9ea">28</strong> <span style="color:#71767b">Supports</span></span>
+            <span><strong style="color:#e7e9ea">12</strong> <span style="color:#71767b">Comments</span></span>
+            <span><strong style="color:#e7e9ea">3</strong> <span style="color:#71767b">Shares</span></span>
+          </div>
+
+          <div style="padding:12px 0;border-bottom:1px solid #2f3336;display:flex;justify-content:space-around">
+            <div class="post-action" style="margin:0">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01z"/></svg>
+            </div>
+            <div class="post-action" style="margin:0">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
+            </div>
+            <div class="post-action supported" style="margin:0">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91z"/></svg>
+            </div>
+            <div class="post-action" style="margin:0">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reply Composer -->
+        <div style="padding:16px;border-bottom:1px solid #2f3336;display:flex;gap:12px">
+          <div class="post-avatar" style="width:40px;height:40px">
+            <div style="width:100%;height:100%;background:#e94560;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:600">JD</div>
+          </div>
+          <div style="flex:1">
+            <input type="text" placeholder="Post your reply" style="width:100%;background:none;border:none;color:#e7e9ea;font-size:1.1rem;outline:none;padding:12px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+              <div style="display:flex;gap:8px">
+                <div class="compose-tool">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5C3 4.119 4.119 3 5.5 3h13C19.881 3 21 4.119 21 5.5v13c0 1.381-1.119 2.5-2.5 2.5h-13C4.119 21 3 19.881 3 18.5v-13zM5.5 5c-.276 0-.5.224-.5.5v9.086l3-3 3 3 5-5 3 3V5.5c0-.276-.224-.5-.5-.5h-13z"/></svg>
+                </div>
+                <div class="compose-tool">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                </div>
+              </div>
+              <button style="background:#e94560;color:white;border:none;padding:8px 16px;border-radius:20px;font-weight:700;cursor:pointer;opacity:0.5">Reply</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comments Thread -->
+        <div class="post" style="cursor:default">
+          <div class="post-avatar" style="background:#2ed573;display:flex;align-items:center;justify-content:center;color:white;font-weight:600">PW</div>
+          <div class="post-content">
+            <div class="post-header">
+              <span class="post-name">Springfield Public Works</span>
+              <span class="post-handle">@springfield_pw</span>
+              <span class="post-time">1h</span>
+              <span class="post-badge staff">Official</span>
+            </div>
+            <div class="post-text">
+              <span style="color:#71767b">Replying to</span> <span style="color:#e94560">@mike_smith</span>
+            </div>
+            <div class="post-text" style="margin-top:8px">
+              Thank you for reporting this! We've reviewed the location and scheduled repairs for Monday 1/20. Crews will be on site 8am-12pm. We've also escalated this to P1 priority.
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01z"/></svg>
+                <span>2</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
+                <span>5</span>
+              </div>
+              <div class="post-action liked">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91z"/></svg>
+                <span>24</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="post" style="cursor:default">
+          <div class="post-avatar">
+            <div style="width:100%;height:100%;background:#e94560;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:600">JD</div>
+          </div>
+          <div class="post-content">
+            <div class="post-header">
+              <span class="post-name">Jane Doe</span>
+              <span class="post-handle">@jane_doe</span>
+              <span class="post-time">45m</span>
+            </div>
+            <div class="post-text">
+              <span style="color:#71767b">Replying to</span> <span style="color:#e94560">@mike_smith</span>
+            </div>
+            <div class="post-text" style="margin-top:8px">
+              I hit this same pothole last week! Glad it's getting fixed. Here's another angle showing how deep it is:
+            </div>
+            <div style="margin-top:12px;border-radius:16px;overflow:hidden;border:1px solid #2f3336">
+              <div style="width:100%;height:180px;background:linear-gradient(135deg,#2d1a1a 0%,#1a2744 100%);display:flex;align-items:center;justify-content:center;color:#71767b;font-size:0.85rem">
+                [Photo showing pothole depth]
+              </div>
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01z"/></svg>
+                <span>1</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
+                <span>0</span>
+              </div>
+              <div class="post-action supported">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91z"/></svg>
+                <span>8</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="post" style="cursor:default">
+          <div class="post-avatar">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="">
+          </div>
+          <div class="post-content">
+            <div class="post-header">
+              <span class="post-name">Mike Smith</span>
+              <span class="post-handle">@mike_smith</span>
+              <span class="post-time">30m</span>
+            </div>
+            <div class="post-text">
+              <span style="color:#71767b">Replying to</span> <span style="color:#e94560">@springfield_pw</span>
+            </div>
+            <div class="post-text" style="margin-top:8px">
+              Amazing response time! Thank you @springfield_pw for taking this seriously. 👏
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01z"/></svg>
+                <span>0</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
+                <span>1</span>
+              </div>
+              <div class="post-action liked">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91z"/></svg>
+                <span>12</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nested Reply -->
+        <div class="post" style="cursor:default;padding-left:56px">
+          <div class="post-avatar" style="width:40px;height:40px">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt="">
+          </div>
+          <div class="post-content">
+            <div class="post-header">
+              <span class="post-name">Sarah Jones</span>
+              <span class="post-handle">@sarah_jones</span>
+              <span class="post-time">15m</span>
+            </div>
+            <div class="post-text">
+              <span style="color:#71767b">Replying to</span> <span style="color:#e94560">@mike_smith</span> <span style="color:#71767b">and</span> <span style="color:#e94560">@springfield_pw</span>
+            </div>
+            <div class="post-text" style="margin-top:8px">
+              This is why I love GovTrack! Real accountability and fast responses. 🙌
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01z"/></svg>
+                <span>0</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
+                <span>0</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91z"/></svg>
+                <span>5</span>
+              </div>
+              <div class="post-action">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ MOBILE CAPTURE ============ -->
+      <div class="page" id="page-mobile">
+        <div class="page-header">
+          <h1>Mobile Capture Experience</h1>
+          <div class="page-header-subtitle">Preview of mobile UI</div>
+        </div>
+
+        <div style="display:flex;justify-content:center;padding:24px">
+          <!-- Phone Frame -->
+          <div style="width:375px;height:812px;background:#000;border-radius:40px;padding:12px;box-shadow:0 0 0 4px #333,0 20px 60px rgba(0,0,0,0.5)">
+            <div style="width:100%;height:100%;background:#000;border-radius:32px;overflow:hidden;position:relative">
+              <!-- Status Bar -->
+              <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;background:#000">
+                <span style="font-size:0.9rem;font-weight:600">9:41</span>
+                <div style="width:125px;height:30px;background:#1a1a1a;border-radius:20px;position:absolute;left:50%;transform:translateX(-50%);top:8px"></div>
+                <div style="display:flex;gap:4px">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 3C7.46 3 3.34 4.78.29 7.67c-.18.18-.29.43-.29.71 0 .28.11.53.29.71l2.48 2.48c.18.18.43.29.71.29.27 0 .52-.11.7-.28.79-.74 1.69-1.36 2.66-1.85.33-.16.56-.5.56-.9v-3.1c1.45-.48 3-.73 4.6-.73s3.15.25 4.6.73v3.1c0 .4.23.74.56.9.98.49 1.87 1.12 2.67 1.85.18.18.43.28.7.28.28 0 .53-.11.71-.29l2.48-2.48c.18-.18.29-.43.29-.71 0-.28-.11-.53-.29-.71C20.66 4.78 16.54 3 12 3z"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+                </div>
+              </div>
+
+              <!-- Mobile App Content -->
+              <div style="height:calc(100% - 44px);overflow-y:auto;background:#000">
+                <!-- Header -->
+                <div style="padding:16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2f3336">
+                  <button style="background:none;border:none;color:#e7e9ea;font-size:1.2rem">×</button>
+                  <span style="font-weight:700">Report Issue</span>
+                  <button style="background:#e94560;color:white;border:none;padding:8px 16px;border-radius:20px;font-weight:700;font-size:0.85rem;opacity:0.5">Post</button>
+                </div>
+
+                <!-- Avatar + Input -->
+                <div style="padding:16px;display:flex;gap:12px">
+                  <div style="width:40px;height:40px;background:#e94560;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:600;flex-shrink:0">JD</div>
+                  <div style="flex:1">
+                    <textarea placeholder="What's happening in your community?" style="width:100%;background:none;border:none;color:#e7e9ea;font-size:1.1rem;resize:none;outline:none;min-height:100px"></textarea>
+                  </div>
+                </div>
+
+                <!-- Image Preview Area -->
+                <div style="padding:0 16px;margin-bottom:16px">
+                  <div style="border-radius:16px;overflow:hidden;border:1px solid #2f3336;position:relative">
+                    <div style="width:100%;height:200px;background:linear-gradient(135deg,#1a2744 0%,#0f3460 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#71767b">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="opacity:0.3"><path d="M3 5.5C3 4.119 4.119 3 5.5 3h13C19.881 3 21 4.119 21 5.5v13c0 1.381-1.119 2.5-2.5 2.5h-13C4.119 21 3 19.881 3 18.5v-13z"/></svg>
+                      <span style="margin-top:8px;font-size:0.85rem">Tap to add photo</span>
+                    </div>
+                    <button style="position:absolute;top:8px;right:8px;width:28px;height:28px;background:#000;border:none;border-radius:50%;color:white;cursor:pointer;opacity:0.8">×</button>
+                  </div>
+                </div>
+
+                <!-- Location -->
+                <div style="padding:0 16px 16px;display:flex;align-items:center;gap:8px;color:#e94560">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                  <span style="font-size:0.9rem">Add location</span>
+                </div>
+
+                <!-- Type Selector -->
+                <div style="padding:16px;border-top:1px solid #2f3336">
+                  <div style="color:#71767b;font-size:0.8rem;margin-bottom:12px">What type of issue is this?</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button style="padding:10px 20px;background:#ff4757;border:none;border-radius:20px;color:white;font-weight:600;font-size:0.9rem">🔴 Problem</button>
+                    <button style="padding:10px 20px;background:#16181c;border:1px solid #2f3336;border-radius:20px;color:#71767b;font-size:0.9rem">💡 Idea</button>
+                    <button style="padding:10px 20px;background:#16181c;border:1px solid #2f3336;border-radius:20px;color:#71767b;font-size:0.9rem">❓ Question</button>
+                  </div>
+                </div>
+
+                <!-- Government Selector -->
+                <div style="padding:16px;border-top:1px solid #2f3336">
+                  <div style="color:#71767b;font-size:0.8rem;margin-bottom:12px">Which government?</div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#16181c;border-radius:12px">
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <div style="width:36px;height:36px;background:#2ed573;border-radius:50%;display:flex;align-items:center;justify-content:center">🏛️</div>
+                      <div>
+                        <div style="font-weight:600">Springfield</div>
+                        <div style="color:#71767b;font-size:0.8rem">@springfield_gov</div>
+                      </div>
+                    </div>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#71767b"><path d="M7 10l5 5 5-5z"/></svg>
+                  </div>
+                </div>
+
+                <!-- Bottom Tools -->
+                <div style="padding:16px;border-top:1px solid #2f3336;display:flex;gap:24px">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#e94560">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5C3 4.119 4.119 3 5.5 3h13C19.881 3 21 4.119 21 5.5v13c0 1.381-1.119 2.5-2.5 2.5h-13C4.119 21 3 19.881 3 18.5v-13zM5.5 5c-.276 0-.5.224-.5.5v9.086l3-3 3 3 5-5 3 3V5.5c0-.276-.224-.5-.5-.5h-13z"/></svg>
+                    <span style="font-size:0.7rem">Photo</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#71767b">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9v7c0 1.1.9 2 2 2h4v-8H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-4v8h4c1.1 0 2-.9 2-2v-7c0-4.97-4.03-9-9-9z"/></svg>
+                    <span style="font-size:0.7rem">Camera</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#71767b">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                    <span style="font-size:0.7rem">Location</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#71767b">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                    <span style="font-size:0.7rem">Tag</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Home Indicator -->
+              <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;background:#fff;border-radius:3px;opacity:0.3"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center;color:#71767b;padding:16px">
+          <p style="margin-bottom:8px">Mobile capture features:</p>
+          <ul style="text-align:left;display:inline-block;font-size:0.9rem">
+            <li>Quick text entry with large tap targets</li>
+            <li>Camera access for photos</li>
+            <li>Auto-detect location via GPS</li>
+            <li>Issue type selector (Problem/Idea/Question)</li>
+            <li>Government auto-suggested from location</li>
+            <li>Minimal friction - 3 taps to post</li>
+          </ul>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="right-sidebar">
+      <div class="search-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#71767b"><path d="M10.25 3.75c-3.59 0-6.5 2.91-6.5 6.5s2.91 6.5 6.5 6.5c1.795 0 3.419-.726 4.596-1.904 1.178-1.177 1.904-2.801 1.904-4.596 0-3.59-2.91-6.5-6.5-6.5zm-8.5 6.5c0-4.694 3.806-8.5 8.5-8.5s8.5 3.806 8.5 8.5c0 1.986-.682 3.815-1.824 5.262l4.781 4.781-1.414 1.414-4.781-4.781c-1.447 1.142-3.276 1.824-5.262 1.824-4.694 0-8.5-3.806-8.5-8.5z"/></svg>
+        <input type="text" placeholder="Search GovTrack">
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">Trending Issues</div>
+        <div class="sidebar-item" onclick="showPage('issue-detail')">
+          <div class="sidebar-item-title">#MainStreetPotholes</div>
+          <div class="sidebar-item-meta">234 posts · Springfield</div>
+        </div>
+        <div class="sidebar-item" onclick="showPage('issue-detail')">
+          <div class="sidebar-item-title">Bus Route 7 Overcrowding</div>
+          <div class="sidebar-item-meta">89 supporters</div>
+        </div>
+        <div class="sidebar-item" onclick="showPage('issue-detail')">
+          <div class="sidebar-item-title">Oak Avenue Lighting</div>
+          <div class="sidebar-item-meta">45 posts</div>
+        </div>
+        <div class="show-more">Show more</div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">Governments to follow</div>
+        <div class="sidebar-item" style="display:flex;gap:12px;align-items:center" onclick="showPage('gov')">
+          <div style="width:40px;height:40px;background:#2ed573;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem">🏛️</div>
+          <div style="flex:1">
+            <div class="sidebar-item-title">Springfield</div>
+            <div class="sidebar-item-meta">@springfield_gov</div>
+          </div>
+        </div>
+        <div class="sidebar-item" style="display:flex;gap:12px;align-items:center">
+          <div style="width:40px;height:40px;background:#3498db;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem">🏛️</div>
+          <div style="flex:1">
+            <div class="sidebar-item-title">Shelbyville</div>
+            <div class="sidebar-item-meta">@shelbyville_gov</div>
+          </div>
+        </div>
+        <div class="show-more">Show more</div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">Popular Ideas</div>
+        <div class="sidebar-item" onclick="showPage('issue-detail')">
+          <div class="sidebar-item-title">Community Transit App</div>
+          <div class="sidebar-item-meta">156 supporters</div>
+        </div>
+        <div class="sidebar-item" onclick="showPage('issue-detail')">
+          <div class="sidebar-item-title">Smart Traffic Signals</div>
+          <div class="sidebar-item-meta">98 supporters</div>
+        </div>
+        <div class="show-more">Show more</div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Compose Modal -->
+  <div class="compose-modal" id="compose-modal">
+    <div class="compose-box">
+      <div class="compose-header">
+        <button class="compose-close" onclick="closeCompose()">×</button>
+      </div>
+      <div class="compose-content">
+        <div class="post-avatar" style="width:40px;height:40px">
+          <div style="width:100%;height:100%;background:#e94560;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:600">JD</div>
+        </div>
+        <div class="compose-textarea">
+          <textarea placeholder="What's happening in your community?"></textarea>
+        </div>
+      </div>
+      <div class="compose-options">
+        <div class="compose-option">📍 Add location</div>
+        <div class="compose-option selected">🔴 Problem</div>
+        <div class="compose-option">💡 Idea</div>
+      </div>
+      <div class="compose-footer">
+        <div class="compose-tools">
+          <div class="compose-tool">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5C3 4.119 4.119 3 5.5 3h13C19.881 3 21 4.119 21 5.5v13c0 1.381-1.119 2.5-2.5 2.5h-13C4.119 21 3 19.881 3 18.5v-13zM5.5 5c-.276 0-.5.224-.5.5v9.086l3-3 3 3 5-5 3 3V5.5c0-.276-.224-.5-.5-.5h-13z"/></svg>
+          </div>
+          <div class="compose-tool">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+          </div>
+        </div>
+        <button class="compose-submit">Post</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Map (for mockup navigation) -->
+  <div class="page-map">
+    <h4>Page Map</h4>
+    <a href="#" onclick="showPage('home')" class="current">Home Feed</a>
+    <a href="#" onclick="showPage('explore')">Explore</a>
+    <a href="#" onclick="showPage('notifications')">Notifications</a>
+    <a href="#" onclick="showPage('my-issues')">My Issues</a>
+    <a href="#" onclick="showPage('board')">Board</a>
+    <a href="#" onclick="showPage('heatmap')">Heatmap</a>
+    <div class="section-label">Profiles</div>
+    <a href="#" onclick="showPage('profile')">User Profile</a>
+    <a href="#" onclick="showPage('gov')">Government</a>
+    <a href="#" onclick="showPage('issue-detail')">Issue Detail</a>
+    <div class="section-label">Capture</div>
+    <a href="#" onclick="showPage('mobile')">Mobile Capture</a>
+  </div>
+
+  <script>
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + pageId).classList.add('active');
+
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      // Don't mark active for detail pages
+      if (['home', 'explore', 'notifications', 'my-issues', 'board', 'heatmap', 'profile'].includes(pageId)) {
+        event?.target?.closest?.('.nav-item')?.classList.add('active');
+      }
+
+      document.querySelectorAll('.page-map a').forEach(a => a.classList.remove('current'));
+    }
+
+    function openCompose() {
+      document.getElementById('compose-modal').classList.add('active');
+    }
+
+    function closeCompose() {
+      document.getElementById('compose-modal').classList.remove('active');
+    }
+
+    document.getElementById('compose-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeCompose();
+    });
+  </script>
+</body>
+</html>
