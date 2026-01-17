@@ -1204,6 +1204,9 @@
         <a href="#" class="nav-item" onclick="showPage('heatmap')">
           <span class="nav-icon">🗺️</span> Heatmap
         </a>
+        <a href="#" class="nav-item" onclick="showPage('graph')">
+          <span class="nav-icon">🕸️</span> Graph
+        </a>
         <a href="#" class="nav-item" onclick="showPage('notifications')">
           <span class="nav-icon">🔔</span> Notifications
           <span class="nav-badge">3</span>
@@ -1569,6 +1572,66 @@
         </div>
       </div>
 
+      <!-- GRAPH VIEW -->
+      <div class="page" id="page-graph">
+        <div class="page-header">
+          <h1>Relationship Graph</h1>
+          <div class="page-header-sub">Force-directed visualization of all entities</div>
+        </div>
+        <div class="type-tabs">
+          <div class="type-tab active">All</div>
+          <div class="type-tab" data-type="goal">Goals</div>
+          <div class="type-tab" data-type="problem">Problems</div>
+          <div class="type-tab" data-type="idea">Ideas</div>
+          <div class="type-tab" data-type="action">Actions</div>
+        </div>
+        <div style="height: 500px; background: var(--bg-secondary); border-radius: 12px; margin: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); position: relative;">
+          <div style="position: absolute; top: 16px; right: 16px; display: flex; gap: 8px;">
+            <button style="background: var(--bg-hover); border: 1px solid var(--border); color: var(--text-primary); padding: 8px 12px; border-radius: 8px; cursor: pointer;">Zoom In</button>
+            <button style="background: var(--bg-hover); border: 1px solid var(--border); color: var(--text-primary); padding: 8px 12px; border-radius: 8px; cursor: pointer;">Zoom Out</button>
+            <button style="background: var(--bg-hover); border: 1px solid var(--border); color: var(--text-primary); padding: 8px 12px; border-radius: 8px; cursor: pointer;">Reset</button>
+          </div>
+          <!-- Placeholder for D3 force-directed graph -->
+          <svg width="400" height="300" style="overflow: visible;">
+            <!-- Sample nodes representing entity types -->
+            <circle cx="80" cy="150" r="24" fill="var(--goal-color)" opacity="0.8"/>
+            <text x="80" y="155" text-anchor="middle" fill="white" font-size="12">Goal</text>
+
+            <circle cx="180" cy="80" r="20" fill="var(--problem-color)" opacity="0.8"/>
+            <text x="180" y="85" text-anchor="middle" fill="white" font-size="11">Prob</text>
+
+            <circle cx="180" cy="220" r="20" fill="var(--problem-color)" opacity="0.8"/>
+            <text x="180" y="225" text-anchor="middle" fill="white" font-size="11">Prob</text>
+
+            <circle cx="280" cy="100" r="18" fill="var(--idea-color)" opacity="0.8"/>
+            <text x="280" y="105" text-anchor="middle" fill="white" font-size="10">Idea</text>
+
+            <circle cx="280" cy="200" r="18" fill="var(--idea-color)" opacity="0.8"/>
+            <text x="280" y="205" text-anchor="middle" fill="white" font-size="10">Idea</text>
+
+            <circle cx="360" cy="150" r="16" fill="var(--action-color)" opacity="0.8"/>
+            <text x="360" y="155" text-anchor="middle" fill="white" font-size="10">Act</text>
+
+            <!-- Sample edges -->
+            <line x1="165" y1="90" x2="95" y2="140" stroke="var(--problem-color)" stroke-width="2" opacity="0.4" stroke-dasharray="4"/>
+            <line x1="165" y1="210" x2="95" y2="160" stroke="var(--problem-color)" stroke-width="2" opacity="0.4" stroke-dasharray="4"/>
+            <line x1="265" y1="105" x2="195" y2="85" stroke="var(--idea-color)" stroke-width="2" opacity="0.4"/>
+            <line x1="265" y1="195" x2="195" y2="215" stroke="var(--idea-color)" stroke-width="2" opacity="0.4"/>
+            <line x1="345" y1="150" x2="295" y2="110" stroke="var(--action-color)" stroke-width="2" opacity="0.4"/>
+          </svg>
+          <div style="margin-top: 20px;">[D3.js Force-Directed Graph]</div>
+          <small>Nodes sized by importance · Click to select · Drag to rearrange</small>
+        </div>
+        <div style="padding: 0 16px 16px;">
+          <div style="display: flex; gap: 24px; justify-content: center; font-size: 0.85rem; color: var(--text-secondary);">
+            <span><span style="display: inline-block; width: 12px; height: 12px; background: var(--goal-color); border-radius: 50%; margin-right: 6px;"></span>Goals</span>
+            <span><span style="display: inline-block; width: 12px; height: 12px; background: var(--problem-color); border-radius: 50%; margin-right: 6px;"></span>Problems</span>
+            <span><span style="display: inline-block; width: 12px; height: 12px; background: var(--idea-color); border-radius: 50%; margin-right: 6px;"></span>Ideas</span>
+            <span><span style="display: inline-block; width: 12px; height: 12px; background: var(--action-color); border-radius: 50%; margin-right: 6px;"></span>Actions</span>
+          </div>
+        </div>
+      </div>
+
       <!-- NOTIFICATIONS -->
       <div class="page" id="page-notifications">
         <div class="page-header">
@@ -1609,6 +1672,102 @@
           <div class="notification-content">
             <div class="notification-text">Action <strong>Launch Sunset solar garden Phase 1</strong> was marked <strong>completed</strong></div>
             <div class="notification-time">2 days ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MENTIONS PAGE -->
+      <div class="page" id="page-mentions">
+        <div class="page-header">
+          <h1>Mentions</h1>
+          <div class="page-header-sub">Places where you've been @mentioned</div>
+        </div>
+        <div class="type-tabs">
+          <div class="type-tab active">All</div>
+          <div class="type-tab">Unread</div>
+          <div class="type-tab">In Comments</div>
+          <div class="type-tab">In Issues</div>
+        </div>
+
+        <!-- Mention in a comment -->
+        <div class="entity-card" onclick="showPage('detail-idea')">
+          <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+            <div class="avatar small">SR</div>
+            <div style="flex: 1;">
+              <div style="font-size: 0.9rem; margin-bottom: 4px;">
+                <strong>Sarah R</strong> <span style="color: var(--text-secondary);">@sarahsf · 3h</span>
+              </div>
+              <div style="color: var(--text-secondary); font-size: 0.85rem;">mentioned you in a comment</div>
+            </div>
+          </div>
+          <div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent); margin-bottom: 12px;">
+            "Great idea! LA already does something similar. <span style="color: var(--accent);">@janedoe</span> didn't you mention working on something like this?"
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="entity-type-badge idea">Idea</span>
+            <span style="font-weight: 600;">AI-powered pothole detection</span>
+          </div>
+        </div>
+
+        <!-- Mention in an issue body -->
+        <div class="entity-card" onclick="showPage('detail')">
+          <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+            <div class="avatar small" style="background: #1565c0;">SF</div>
+            <div style="flex: 1;">
+              <div style="font-size: 0.9rem; margin-bottom: 4px;">
+                <strong>SF Public Works</strong>
+                <span style="background: var(--idea-color); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; margin-left: 4px;">OFFICIAL</span>
+                <span style="color: var(--text-secondary);"> · 1d</span>
+              </div>
+              <div style="color: var(--text-secondary); font-size: 0.85rem;">mentioned you in a response</div>
+            </div>
+          </div>
+          <div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; border-left: 3px solid var(--idea-color); margin-bottom: 12px;">
+            "Thanks for reporting. <span style="color: var(--accent);">@janedoe</span> we've dispatched a crew and expect repairs within 48 hours. Stay safe!"
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="entity-type-badge problem">Problem</span>
+            <span style="font-weight: 600;">Dangerous pothole at Market & 5th</span>
+          </div>
+        </div>
+
+        <!-- Mention in another comment -->
+        <div class="entity-card" onclick="showPage('detail-idea')">
+          <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+            <div class="avatar small">MC</div>
+            <div style="flex: 1;">
+              <div style="font-size: 0.9rem; margin-bottom: 4px;">
+                <strong>Mike Chen</strong> <span style="color: var(--text-secondary);">@mikec · 2d</span>
+              </div>
+              <div style="color: var(--text-secondary); font-size: 0.85rem;">mentioned you in a comment</div>
+            </div>
+          </div>
+          <div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent); margin-bottom: 12px;">
+            "<span style="color: var(--accent);">@janedoe</span> Have you seen the new camera specs? They might work for your citizen hazard app idea too."
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="entity-type-badge idea">Idea</span>
+            <span style="font-weight: 600;">Citizen-reported hazard app</span>
+          </div>
+        </div>
+
+        <!-- Older mention -->
+        <div class="entity-card" style="opacity: 0.7;">
+          <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+            <div class="avatar small">TW</div>
+            <div style="flex: 1;">
+              <div style="font-size: 0.9rem; margin-bottom: 4px;">
+                <strong>Tom Wilson</strong> <span style="color: var(--text-secondary);">@tomw · 1w</span>
+              </div>
+              <div style="color: var(--text-secondary); font-size: 0.85rem;">mentioned you in a comment</div>
+            </div>
+          </div>
+          <div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; border-left: 3px solid var(--border); margin-bottom: 12px;">
+            "Agreed with <span style="color: var(--accent);">@janedoe</span> - we need better bike infrastructure in SOMA."
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="entity-type-badge goal">Goal</span>
+            <span style="font-weight: 600;">Vision Zero: Eliminate traffic deaths</span>
           </div>
         </div>
       </div>
@@ -1912,11 +2071,48 @@
                 Vision Zero: Eliminate traffic deaths
               </div>
             </div>
-            <div>
+            <div style="margin-bottom: 12px;">
               <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Being implemented by:</div>
               <div class="relationship-chip" style="display: inline-flex;">
                 <span class="dot action"></span>
                 Deploy pilot detection on Market St (In Progress)
+              </div>
+            </div>
+
+            <!-- Idea-to-Idea Relationships -->
+            <div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Related ideas:</div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div class="relationship-chip" style="display: inline-flex; justify-content: space-between; padding: 8px 12px;">
+                  <span style="display: flex; align-items: center; gap: 8px;"><span class="dot idea"></span> Citizen-reported hazard app</span>
+                  <span style="background: var(--goal-color); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; color: white;">complements</span>
+                </div>
+                <div class="relationship-chip" style="display: inline-flex; justify-content: space-between; padding: 8px 12px;">
+                  <span style="display: flex; align-items: center; gap: 8px;"><span class="dot idea"></span> Manual road inspection program</span>
+                  <span style="background: var(--action-color); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; color: white;">alternative</span>
+                </div>
+                <div class="relationship-chip" style="display: inline-flex; justify-content: space-between; padding: 8px 12px;">
+                  <span style="display: flex; align-items: center; gap: 8px;"><span class="dot idea"></span> Smart traffic camera network</span>
+                  <span style="background: var(--idea-color); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; color: white;">requires</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Similar Ideas (AI-detected) -->
+          <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="background: var(--idea-color); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; color: white; font-weight: 600;">AI</span>
+              <span style="font-size: 0.85rem; color: var(--text-secondary);">Similar ideas detected:</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div class="relationship-chip" style="display: inline-flex; justify-content: space-between; padding: 8px 12px;">
+                <span style="display: flex; align-items: center; gap: 8px;"><span class="dot idea"></span> "Use cameras to find potholes" (merged)</span>
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">92% similar</span>
+              </div>
+              <div class="relationship-chip" style="display: inline-flex; justify-content: space-between; padding: 8px 12px;">
+                <span style="display: flex; align-items: center; gap: 8px;"><span class="dot idea"></span> "Automated road damage detection"</span>
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">87% similar</span>
               </div>
             </div>
           </div>
@@ -1926,6 +2122,7 @@
               👍 Support this idea
             </button>
             <span style="font-size: 1.1rem; font-weight: 700;">128 supporters</span>
+            <span style="font-size: 0.85rem; color: var(--text-secondary);">(merged from 3 submissions)</span>
           </div>
         </div>
 
@@ -2207,7 +2404,9 @@
     <a href="#" onclick="showPage('explore')">Explore</a>
     <a href="#" onclick="showPage('board')">Board View</a>
     <a href="#" onclick="showPage('heatmap')">Heatmap</a>
+    <a href="#" onclick="showPage('graph')">Graph</a>
     <a href="#" onclick="showPage('notifications')">Notifications</a>
+    <a href="#" onclick="showPage('mentions')">Mentions</a>
     <a href="#" onclick="showPage('review')">Review Queue</a>
     <div class="section-label">Profiles</div>
     <a href="#" onclick="showPage('profile')">User Profile</a>
