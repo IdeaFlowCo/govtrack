@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GovTrack v3 - Comprehensive UI Mockup</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #15202b;
+      color: #e7e9ea;
+      min-height: 100vh;
+    }
+
+    /* Entity Type Colors */
+    :root {
+      --goal-color: #4CAF50;
+      --problem-color: #f44336;
+      --idea-color: #2196F3;
+      --action-color: #FF9800;
+      --accent: #e94560;
+      --bg-primary: #15202b;
+      --bg-secondary: #192734;
+      --bg-hover: #22303c;
+      --border: #38444d;
+      --text-primary: #e7e9ea;
+      --text-secondary: #8899a6;
+    }
+
+    /* Layout */
+    .app-container {
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+
+    /* Left Sidebar */
+    .left-sidebar {
+      width: 275px;
+      padding: 0 12px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+    }
+
+    .logo {
+      padding: 12px;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Government Selector */
+    .gov-selector {
+      margin: 8px 12px;
+      padding: 12px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+    }
+
+    .gov-selector:hover {
+      background: var(--bg-hover);
+    }
+
+    .gov-selector-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .gov-selector-value {
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-menu {
+      margin-top: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 12px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-hover);
+    }
+
+    .nav-item.active {
+      font-weight: 700;
+    }
+
+    .nav-icon {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .nav-badge {
+      background: var(--accent);
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+      margin-left: auto;
+    }
+
+    .capture-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 16px 0;
+      border-radius: 30px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin: 16px 12px;
+      width: calc(100% - 24px);
+    }
+
+    .capture-btn:hover {
+      background: #d63d56;
+    }
+
+    .user-widget {
+      margin-top: auto;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .user-widget:hover {
+      background: var(--bg-hover);
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .avatar.small {
+      width: 32px;
+      height: 32px;
+      font-size: 0.85rem;
+    }
+
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .user-handle {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      max-width: 600px;
+      border-right: 1px solid var(--border);
+      min-height: 100vh;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .page-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(21, 32, 43, 0.95);
+      backdrop-filter: blur(12px);
+      z-index: 10;
+    }
+
+    .page-header h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .page-header-sub {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    /* Entity Type Tabs */
+    .type-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .type-tab {
+      flex: 1;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .type-tab:hover {
+      background: var(--bg-hover);
+    }
+
+    .type-tab.active {
+      color: var(--text-primary);
+      border-bottom-color: var(--accent);
+      font-weight: 700;
+    }
+
+    .type-tab[data-type="goal"].active { border-bottom-color: var(--goal-color); }
+    .type-tab[data-type="problem"].active { border-bottom-color: var(--problem-color); }
+    .type-tab[data-type="idea"].active { border-bottom-color: var(--idea-color); }
+    .type-tab[data-type="action"].active { border-bottom-color: var(--action-color); }
+
+    /* Entity Cards */
+    .entity-card {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .entity-card:hover {
+      background: var(--bg-hover);
+    }
+
+    .entity-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .entity-type-badge {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .entity-type-badge.goal { background: var(--goal-color); color: white; }
+    .entity-type-badge.problem { background: var(--problem-color); color: white; }
+    .entity-type-badge.idea { background: var(--idea-color); color: white; }
+    .entity-type-badge.action { background: var(--action-color); color: white; }
+
+    .entity-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      flex: 1;
+    }
+
+    .entity-gov {
+      background: var(--bg-secondary);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .entity-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .entity-body {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .entity-image {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      max-height: 300px;
+      object-fit: cover;
+      background: var(--bg-secondary);
+    }
+
+    .entity-location {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+
+    /* Progress Bar (Goals) */
+    .entity-progress {
+      margin: 12px 0;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: var(--bg-secondary);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+
+    .progress-fill.low { background: var(--problem-color); }
+    .progress-fill.medium { background: var(--action-color); }
+    .progress-fill.high { background: var(--goal-color); }
+
+    /* Relationship Indicators */
+    .entity-relationships {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .relationship-chip {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .relationship-chip .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .relationship-chip .dot.goal { background: var(--goal-color); }
+    .relationship-chip .dot.problem { background: var(--problem-color); }
+    .relationship-chip .dot.idea { background: var(--idea-color); }
+    .relationship-chip .dot.action { background: var(--action-color); }
+
+    /* Entity Actions */
+    .entity-actions {
+      display: flex;
+      justify-content: space-between;
+      max-width: 400px;
+    }
+
+    .entity-action {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      padding: 8px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .entity-action:hover {
+      background: rgba(29, 155, 240, 0.1);
+      color: #1d9bf0;
+    }
+
+    .entity-action.support:hover {
+      background: rgba(0, 186, 124, 0.1);
+      color: #00ba7c;
+    }
+
+    .entity-action.supported {
+      color: #00ba7c;
+    }
+
+    /* Right Sidebar */
+    .right-sidebar {
+      width: 350px;
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-section {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .sidebar-section-header {
+      padding: 12px 16px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .sidebar-item:hover {
+      background: var(--bg-hover);
+    }
+
+    .sidebar-item-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
+    }
+
+    .sidebar-item-meta {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .stat-card {
+      background: var(--bg-hover);
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .stat-value.goal { color: var(--goal-color); }
+    .stat-value.problem { color: var(--problem-color); }
+    .stat-value.idea { color: var(--idea-color); }
+    .stat-value.action { color: var(--action-color); }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    /* Board View */
+    .board-container {
+      display: flex;
+      height: calc(100vh - 60px);
+      overflow-x: auto;
+    }
+
+    .board-column {
+      min-width: 280px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+    }
+
+    .board-column:last-child {
+      border-right: none;
+    }
+
+    .board-column-header {
+      padding: 16px;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid;
+    }
+
+    .board-column.goals .board-column-header { border-color: var(--goal-color); color: var(--goal-color); }
+    .board-column.problems .board-column-header { border-color: var(--problem-color); color: var(--problem-color); }
+    .board-column.ideas .board-column-header { border-color: var(--idea-color); color: var(--idea-color); }
+    .board-column.actions .board-column-header { border-color: var(--action-color); color: var(--action-color); }
+
+    .board-column-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .board-card {
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .board-card:hover {
+      background: var(--bg-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .board-card-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .board-card-meta {
+      display: flex;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .board-card-badge {
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--bg-hover);
+    }
+
+    /* SVG Connections */
+    .connections-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .connection-line {
+      fill: none;
+      stroke-width: 2;
+      opacity: 0.4;
+    }
+
+    .connection-line.threatens { stroke: var(--problem-color); stroke-dasharray: 4; }
+    .connection-line.addresses { stroke: var(--idea-color); }
+    .connection-line.implements { stroke: var(--action-color); }
+
+    /* Review Queue */
+    .review-item {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .review-item-content {
+      background: var(--bg-secondary);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .ai-suggestion {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding: 12px;
+      background: rgba(33, 150, 243, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(33, 150, 243, 0.3);
+    }
+
+    .ai-badge {
+      background: var(--idea-color);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .confidence-bar {
+      flex: 1;
+      height: 8px;
+      background: var(--bg-hover);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      background: var(--idea-color);
+    }
+
+    .confidence-value {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .review-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .review-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .review-btn.confirm {
+      background: var(--goal-color);
+      color: white;
+    }
+
+    .review-btn.change {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .review-btn.dismiss {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    /* Capture Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 5vh;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .capture-modal {
+      background: var(--bg-primary);
+      border-radius: 16px;
+      width: 600px;
+      max-width: 95vw;
+      border: 1px solid var(--border);
+    }
+
+    .capture-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .capture-modal-close {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 50%;
+    }
+
+    .capture-modal-close:hover {
+      background: var(--bg-hover);
+    }
+
+    .capture-modal-body {
+      padding: 16px;
+    }
+
+    .capture-textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.2rem;
+      resize: none;
+      min-height: 120px;
+      outline: none;
+    }
+
+    .capture-textarea::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .capture-options {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    .capture-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+    }
+
+    .capture-option:hover {
+      background: var(--bg-hover);
+    }
+
+    .capture-option.active {
+      border-color: var(--accent);
+      background: rgba(233, 69, 96, 0.1);
+    }
+
+    .capture-modal-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .capture-tools {
+      display: flex;
+      gap: 8px;
+    }
+
+    .capture-tool {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      color: var(--accent);
+      font-size: 1.1rem;
+    }
+
+    .capture-tool:hover {
+      background: rgba(233, 69, 96, 0.1);
+    }
+
+    .capture-submit {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .capture-submit:hover {
+      background: #d63d56;
+    }
+
+    .capture-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Heatmap placeholder */
+    .heatmap-container {
+      height: 400px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      margin: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+    }
+
+    /* Notifications */
+    .notification-item {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .notification-item:hover {
+      background: var(--bg-hover);
+    }
+
+    .notification-item.unread {
+      background: rgba(29, 155, 240, 0.05);
+    }
+
+    .notification-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .notification-icon.mention { background: rgba(33, 150, 243, 0.2); color: var(--idea-color); }
+    .notification-icon.support { background: rgba(0, 186, 124, 0.2); color: #00ba7c; }
+    .notification-icon.update { background: rgba(255, 152, 0, 0.2); color: var(--action-color); }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .notification-text {
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .notification-text strong {
+      font-weight: 700;
+    }
+
+    .notification-time {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Profile */
+    .profile-header {
+      position: relative;
+    }
+
+    .profile-cover {
+      height: 200px;
+      background: linear-gradient(135deg, var(--accent), #1a1a2e);
+    }
+
+    .profile-info {
+      padding: 12px 16px 16px;
+      position: relative;
+    }
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--bg-primary);
+      border: 4px solid var(--bg-primary);
+      position: absolute;
+      top: -60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 700;
+      color: white;
+      background: var(--accent);
+    }
+
+    .profile-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 48px;
+    }
+
+    .profile-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-primary);
+    }
+
+    .profile-btn:hover {
+      background: var(--bg-hover);
+    }
+
+    .profile-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .profile-handle {
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .profile-bio {
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .profile-stats {
+      display: flex;
+      gap: 20px;
+    }
+
+    .profile-stat {
+      font-size: 0.95rem;
+    }
+
+    .profile-stat strong {
+      font-weight: 700;
+    }
+
+    /* Page Map */
+    .page-map {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      z-index: 500;
+      max-width: 200px;
+    }
+
+    .page-map h4 {
+      margin-bottom: 12px;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+
+    .page-map a {
+      display: block;
+      padding: 6px 0;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .page-map a:hover {
+      color: var(--accent);
+    }
+
+    .page-map a.current {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .page-map .section-label {
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      margin-top: 12px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    /* Government Profile */
+    .gov-header {
+      position: relative;
+    }
+
+    .gov-cover {
+      height: 200px;
+      background: linear-gradient(135deg, #1565c0, #0d47a1);
+    }
+
+    .gov-logo {
+      width: 100px;
+      height: 100px;
+      border-radius: 16px;
+      background: white;
+      border: 4px solid var(--bg-primary);
+      position: absolute;
+      top: 150px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    .gov-info {
+      padding: 60px 16px 16px;
+    }
+
+    .gov-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .gov-type {
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .gov-description {
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    /* Comments Thread */
+    .comments-section {
+      border-top: 1px solid var(--border);
+    }
+
+    .comment {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+    }
+
+    .comment-content {
+      flex: 1;
+    }
+
+    .comment-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .comment-author {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .comment-handle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .comment-time {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .comment-text {
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .comment-text .mention {
+      color: var(--accent);
+    }
+
+    .comment-actions {
+      display: flex;
+      gap: 24px;
+    }
+
+    .comment-action {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .comment-action:hover {
+      color: var(--accent);
+    }
+
+    /* Reply Composer */
+    .reply-composer {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+    }
+
+    .reply-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .reply-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .reply-submit {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Left Sidebar -->
+    <div class="left-sidebar">
+      <div class="logo">
+        <div class="logo-icon">G</div>
+        GovTrack
+      </div>
+
+      <div class="gov-selector" onclick="showPage('gov')">
+        <div class="gov-selector-label">Viewing</div>
+        <div class="gov-selector-value">
+          San Francisco, CA
+          <span>▼</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#" class="nav-item active" onclick="showPage('home')">
+          <span class="nav-icon">🏠</span> Home
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('explore')">
+          <span class="nav-icon">🔍</span> Explore
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('board')">
+          <span class="nav-icon">📋</span> Board
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('heatmap')">
+          <span class="nav-icon">🗺️</span> Heatmap
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('notifications')">
+          <span class="nav-icon">🔔</span> Notifications
+          <span class="nav-badge">3</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('review')">
+          <span class="nav-icon">✓</span> Review Queue
+          <span class="nav-badge">5</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('profile')">
+          <span class="nav-icon">👤</span> Profile
+        </a>
+      </nav>
+
+      <button class="capture-btn" onclick="openCapture()">+ Capture Issue</button>
+
+      <div class="user-widget" onclick="showPage('profile')">
+        <div class="avatar">JD</div>
+        <div class="user-info">
+          <div class="user-name">Jane Doe</div>
+          <div class="user-handle">@janedoe</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- HOME FEED -->
+      <div class="page active" id="page-home">
+        <div class="page-header">
+          <h1>Home</h1>
+          <div class="page-header-sub">San Francisco, CA</div>
+        </div>
+
+        <div class="type-tabs">
+          <div class="type-tab active">All</div>
+          <div class="type-tab" data-type="goal">Goals</div>
+          <div class="type-tab" data-type="problem">Problems</div>
+          <div class="type-tab" data-type="idea">Ideas</div>
+          <div class="type-tab" data-type="action">Actions</div>
+        </div>
+
+        <!-- Goal Card with Progress -->
+        <div class="entity-card" onclick="showPage('detail-goal')">
+          <div class="entity-card-header">
+            <span class="entity-type-badge goal">Goal</span>
+            <div class="entity-meta">
+              <span class="entity-gov">SF Transportation</span>
+              <span>· 2h ago</span>
+            </div>
+          </div>
+          <div class="entity-title">Vision Zero: Eliminate traffic deaths by 2030</div>
+          <div class="entity-body">A citywide commitment to reduce traffic fatalities and serious injuries to zero through engineering, enforcement, and education.</div>
+          <div class="entity-progress">
+            <div class="progress-label">
+              <span>12/18 problems being addressed</span>
+              <span>67%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill medium" style="width: 67%"></div>
+            </div>
+          </div>
+          <div class="entity-relationships">
+            <span class="relationship-chip"><span class="dot problem"></span> 18 problems</span>
+            <span class="relationship-chip"><span class="dot idea"></span> 24 ideas</span>
+          </div>
+          <div class="entity-actions">
+            <span class="entity-action">💬 12</span>
+            <span class="entity-action">🔗 42</span>
+            <span class="entity-action">↗️ Share</span>
+          </div>
+        </div>
+
+        <!-- Problem Card with Location + Image -->
+        <div class="entity-card" onclick="showPage('detail')">
+          <div class="entity-card-header">
+            <span class="entity-type-badge problem">Problem</span>
+            <div class="entity-meta">
+              <span class="entity-gov">SF Public Works</span>
+              <span>· 4h ago</span>
+            </div>
+          </div>
+          <div class="entity-title">Dangerous pothole at Market & 5th intersection</div>
+          <div class="entity-body">Large pothole approximately 2 feet wide causing vehicles to swerve. Multiple near-miss incidents reported.</div>
+          <div class="entity-location">📍 Market St & 5th St, San Francisco</div>
+          <div style="height: 200px; background: linear-gradient(135deg, #333, #555); border-radius: 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: #888;">
+            [Photo of pothole]
+          </div>
+          <div class="entity-relationships">
+            <span class="relationship-chip"><span class="dot goal"></span> threatens 1 goal</span>
+            <span class="relationship-chip"><span class="dot idea"></span> 3 ideas proposed</span>
+          </div>
+          <div class="entity-actions">
+            <span class="entity-action">💬 8</span>
+            <span class="entity-action">📢 15 reports</span>
+            <span class="entity-action">↗️ Share</span>
+          </div>
+        </div>
+
+        <!-- Idea Card with Support -->
+        <div class="entity-card" onclick="showPage('detail-idea')">
+          <div class="entity-card-header">
+            <span class="entity-type-badge idea">Idea</span>
+            <div class="entity-meta">
+              <span>@mikec</span>
+              <span class="entity-gov">SF Transportation</span>
+              <span>· 6h ago</span>
+            </div>
+          </div>
+          <div class="entity-title">Implement AI-powered pothole detection using street cameras</div>
+          <div class="entity-body">Use existing traffic cameras with computer vision to automatically detect and report road damage. This could identify problems before citizens report them.</div>
+          <div class="entity-relationships">
+            <span class="relationship-chip"><span class="dot problem"></span> addresses 3 problems</span>
+            <span class="relationship-chip"><span class="dot goal"></span> pursues 1 goal</span>
+          </div>
+          <div class="entity-actions">
+            <span class="entity-action">💬 24</span>
+            <span class="entity-action support supported">👍 128 support</span>
+            <span class="entity-action">↗️ Share</span>
+          </div>
+        </div>
+
+        <!-- Action Card -->
+        <div class="entity-card" onclick="showPage('detail-action')">
+          <div class="entity-card-header">
+            <span class="entity-type-badge action">Action</span>
+            <div class="entity-meta">
+              <span class="entity-gov">SF Public Works</span>
+              <span>· 1d ago</span>
+            </div>
+          </div>
+          <div class="entity-title">Deploy pilot pothole detection system on Market Street corridor</div>
+          <div class="entity-body">Install and configure AI detection on 12 cameras along Market St as Phase 1 pilot. Target: 2 weeks.</div>
+          <div class="entity-relationships">
+            <span class="relationship-chip"><span class="dot idea"></span> implements 1 idea</span>
+            <span class="relationship-chip"><span class="dot action"></span> 2 dependencies</span>
+          </div>
+          <div class="entity-actions">
+            <span class="entity-action">💬 6</span>
+            <span class="entity-action">📊 In Progress</span>
+            <span class="entity-action">↗️ Share</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPLORE PAGE -->
+      <div class="page" id="page-explore">
+        <div class="page-header">
+          <h1>Explore</h1>
+        </div>
+        <div class="type-tabs">
+          <div class="type-tab active">Trending</div>
+          <div class="type-tab">Governments</div>
+          <div class="type-tab">Near Me</div>
+        </div>
+
+        <div style="padding: 16px;">
+          <h3 style="margin-bottom: 12px; color: var(--text-secondary); font-size: 0.9rem;">TRENDING IN SAN FRANCISCO</h3>
+        </div>
+
+        <div class="entity-card">
+          <div class="entity-card-header">
+            <span class="entity-type-badge problem">Problem</span>
+            <div class="entity-meta">
+              <span>42 reports today</span>
+            </div>
+          </div>
+          <div class="entity-title">MUNI delays on N-Judah line</div>
+          <div class="entity-body">Multiple signal failures causing 20+ minute delays during morning commute.</div>
+        </div>
+
+        <div class="entity-card">
+          <div class="entity-card-header">
+            <span class="entity-type-badge idea">Idea</span>
+            <div class="entity-meta">
+              <span>89 supporters</span>
+            </div>
+          </div>
+          <div class="entity-title">Free MUNI for seniors during off-peak hours</div>
+        </div>
+      </div>
+
+      <!-- BOARD VIEW -->
+      <div class="page" id="page-board" style="max-width: none; border-right: none;">
+        <div class="page-header">
+          <h1>Board View</h1>
+          <div class="page-header-sub">San Francisco, CA · 4-Column Overview</div>
+        </div>
+
+        <div class="board-container" style="position: relative;">
+          <svg class="connections-svg" id="board-connections"></svg>
+
+          <div class="board-column goals">
+            <div class="board-column-header">
+              🎯 Goals <span style="opacity:0.7">4</span>
+            </div>
+            <div class="board-column-content">
+              <div class="board-card" data-id="g1">
+                <div class="board-card-title">Vision Zero: Eliminate traffic deaths by 2030</div>
+                <div class="entity-progress" style="margin: 8px 0 0;">
+                  <div class="progress-bar">
+                    <div class="progress-fill medium" style="width: 67%"></div>
+                  </div>
+                </div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge">67%</span>
+                  <span>18 problems</span>
+                </div>
+              </div>
+              <div class="board-card" data-id="g2">
+                <div class="board-card-title">100% renewable energy by 2035</div>
+                <div class="entity-progress" style="margin: 8px 0 0;">
+                  <div class="progress-bar">
+                    <div class="progress-fill high" style="width: 82%"></div>
+                  </div>
+                </div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge">82%</span>
+                  <span>6 problems</span>
+                </div>
+              </div>
+              <div class="board-card" data-id="g3">
+                <div class="board-card-title">Affordable housing for all income levels</div>
+                <div class="entity-progress" style="margin: 8px 0 0;">
+                  <div class="progress-bar">
+                    <div class="progress-fill low" style="width: 23%"></div>
+                  </div>
+                </div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge">23%</span>
+                  <span>31 problems</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="board-column problems">
+            <div class="board-column-header">
+              ⚠️ Problems <span style="opacity:0.7">12</span>
+            </div>
+            <div class="board-column-content">
+              <div class="board-card" data-id="p1">
+                <div class="board-card-title">Dangerous pothole at Market & 5th</div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge" style="background: var(--action-color);">being addressed</span>
+                  <span>15 reports</span>
+                </div>
+              </div>
+              <div class="board-card" data-id="p2">
+                <div class="board-card-title">Missing crosswalk signals at Castro & 18th</div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge">acknowledged</span>
+                  <span>8 reports</span>
+                </div>
+              </div>
+              <div class="board-card" data-id="p3">
+                <div class="board-card-title">Solar panel installation delays</div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge" style="background: var(--goal-color);">resolved</span>
+                </div>
+              </div>
+              <div class="board-card" data-id="p4">
+                <div class="board-card-title">High rent displacing long-term residents</div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge" style="background: var(--problem-color);">unacknowledged</span>
+                  <span>203 reports</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="board-column ideas">
+            <div class="board-column-header">
+              💡 Ideas <span style="opacity:0.7">8</span>
+            </div>
+            <div class="board-column-content">
+              <div class="board-card" data-id="i1">
+                <div class="board-card-title">AI-powered pothole detection</div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge" style="background: var(--goal-color);">accepted</span>
+                  <span>👍 128</span>
+                </div>
+              </div>
+              <div class="board-card" data-id="i2">
+                <div class="board-card-title">Citizen-reported hazard app</div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge">under review</span>
+                  <span>👍 67</span>
+                </div>
+              </div>
+              <div class="board-card" data-id="i3">
+                <div class="board-card-title">Community solar gardens program</div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge" style="background: var(--goal-color);">accepted</span>
+                  <span>👍 234</span>
+                </div>
+              </div>
+              <div class="board-card" data-id="i4">
+                <div class="board-card-title">Rent stabilization expansion</div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge">proposed</span>
+                  <span>👍 892</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="board-column actions">
+            <div class="board-column-header">
+              ✓ Actions <span style="opacity:0.7">6</span>
+            </div>
+            <div class="board-column-content">
+              <div class="board-card" data-id="a1">
+                <div class="board-card-title">Deploy pilot detection on Market St</div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge" style="background: var(--idea-color);">in progress</span>
+                  <span>Due: Jan 30</span>
+                </div>
+              </div>
+              <div class="board-card" data-id="a2">
+                <div class="board-card-title">Install signals at Castro & 18th</div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge">open</span>
+                  <span>Due: Feb 15</span>
+                </div>
+              </div>
+              <div class="board-card" data-id="a3">
+                <div class="board-card-title">Launch Sunset solar garden Phase 1</div>
+                <div class="board-card-meta">
+                  <span class="board-card-badge" style="background: var(--goal-color);">completed</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HEATMAP -->
+      <div class="page" id="page-heatmap">
+        <div class="page-header">
+          <h1>Issue Heatmap</h1>
+          <div class="page-header-sub">Geographic distribution of problems</div>
+        </div>
+        <div class="type-tabs">
+          <div class="type-tab active">All Problems</div>
+          <div class="type-tab">Infrastructure</div>
+          <div class="type-tab">Safety</div>
+          <div class="type-tab">Environment</div>
+        </div>
+        <div class="heatmap-container">
+          [Interactive Map - Leaflet/Mapbox]<br>
+          <small>Cluster markers showing problem density</small>
+        </div>
+        <div style="padding: 16px;">
+          <h3 style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-secondary);">HOTSPOTS</h3>
+          <div class="entity-card" style="border-bottom: none; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px;">
+            <div class="entity-title">Downtown/SOMA</div>
+            <div class="entity-body">47 active problems · 12 being addressed</div>
+          </div>
+          <div class="entity-card" style="border-bottom: none; border: 1px solid var(--border); border-radius: 12px;">
+            <div class="entity-title">Mission District</div>
+            <div class="entity-body">31 active problems · 8 being addressed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="page" id="page-notifications">
+        <div class="page-header">
+          <h1>Notifications</h1>
+        </div>
+        <div class="type-tabs">
+          <div class="type-tab active">All</div>
+          <div class="type-tab">Mentions</div>
+          <div class="type-tab">Updates</div>
+        </div>
+
+        <div class="notification-item unread">
+          <div class="notification-icon mention">@</div>
+          <div class="notification-content">
+            <div class="notification-text"><strong>@mikec</strong> mentioned you in a comment on <strong>AI-powered pothole detection</strong></div>
+            <div class="notification-time">2 hours ago</div>
+          </div>
+        </div>
+
+        <div class="notification-item unread">
+          <div class="notification-icon support">👍</div>
+          <div class="notification-content">
+            <div class="notification-text"><strong>15 people</strong> supported your idea <strong>Citizen-reported hazard app</strong></div>
+            <div class="notification-time">5 hours ago</div>
+          </div>
+        </div>
+
+        <div class="notification-item unread">
+          <div class="notification-icon update">📋</div>
+          <div class="notification-content">
+            <div class="notification-text">Status changed to <strong>being addressed</strong> on <strong>Dangerous pothole at Market & 5th</strong></div>
+            <div class="notification-time">1 day ago</div>
+          </div>
+        </div>
+
+        <div class="notification-item">
+          <div class="notification-icon update">✓</div>
+          <div class="notification-content">
+            <div class="notification-text">Action <strong>Launch Sunset solar garden Phase 1</strong> was marked <strong>completed</strong></div>
+            <div class="notification-time">2 days ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REVIEW QUEUE -->
+      <div class="page" id="page-review">
+        <div class="page-header">
+          <h1>Review Queue</h1>
+          <div class="page-header-sub">AI-classified items needing confirmation</div>
+        </div>
+
+        <div class="review-item">
+          <div class="review-item-content">
+            <div class="entity-body">"The streetlight on Oak and Divisadero has been out for weeks. It's really dark and unsafe at night."</div>
+            <div class="entity-location">📍 Oak St & Divisadero St</div>
+          </div>
+          <div class="ai-suggestion">
+            <span class="ai-badge">AI</span>
+            <span>Suggested: <strong>Problem</strong></span>
+            <div class="confidence-bar">
+              <div class="confidence-fill" style="width: 78%"></div>
+            </div>
+            <span class="confidence-value">78%</span>
+          </div>
+          <div class="review-actions">
+            <button class="review-btn confirm">✓ Confirm as Problem</button>
+            <button class="review-btn change">Change Type</button>
+            <button class="review-btn dismiss">Dismiss</button>
+          </div>
+        </div>
+
+        <div class="review-item">
+          <div class="review-item-content">
+            <div class="entity-body">"What if we had bike repair stations at every BART station? Would make commuting by bike so much easier."</div>
+          </div>
+          <div class="ai-suggestion">
+            <span class="ai-badge">AI</span>
+            <span>Suggested: <strong>Idea</strong></span>
+            <div class="confidence-bar">
+              <div class="confidence-fill" style="width: 85%"></div>
+            </div>
+            <span class="confidence-value">85%</span>
+          </div>
+          <div class="review-actions">
+            <button class="review-btn confirm">✓ Confirm as Idea</button>
+            <button class="review-btn change">Change Type</button>
+            <button class="review-btn dismiss">Dismiss</button>
+          </div>
+        </div>
+
+        <div class="review-item">
+          <div class="review-item-content">
+            <div class="entity-body">"We need to make SF carbon neutral. This should be a top priority."</div>
+          </div>
+          <div class="ai-suggestion">
+            <span class="ai-badge">AI</span>
+            <span>Suggested: <strong>Goal</strong></span>
+            <div class="confidence-bar">
+              <div class="confidence-fill" style="width: 72%"></div>
+            </div>
+            <span class="confidence-value">72%</span>
+          </div>
+          <div class="review-actions">
+            <button class="review-btn confirm">✓ Confirm as Goal</button>
+            <button class="review-btn change">Change Type</button>
+            <button class="review-btn dismiss">Dismiss</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- USER PROFILE -->
+      <div class="page" id="page-profile">
+        <div class="profile-header">
+          <div class="profile-cover"></div>
+          <div class="profile-info">
+            <div class="profile-avatar">JD</div>
+            <div class="profile-actions">
+              <button class="profile-btn">Edit profile</button>
+            </div>
+            <div class="profile-name">Jane Doe</div>
+            <div class="profile-handle">@janedoe</div>
+            <div class="profile-bio">Civic tech enthusiast. Working to make SF better for everyone. 🌉</div>
+            <div class="profile-stats">
+              <span class="profile-stat"><strong>24</strong> submissions</span>
+              <span class="profile-stat"><strong>156</strong> supported</span>
+              <span class="profile-stat"><strong>89</strong> comments</span>
+            </div>
+          </div>
+        </div>
+        <div class="type-tabs">
+          <div class="type-tab active">Submissions</div>
+          <div class="type-tab">Supported</div>
+          <div class="type-tab">Comments</div>
+        </div>
+
+        <div class="entity-card">
+          <div class="entity-card-header">
+            <span class="entity-type-badge idea">Idea</span>
+            <div class="entity-meta">
+              <span>· 3d ago</span>
+            </div>
+          </div>
+          <div class="entity-title">Citizen-reported hazard app</div>
+          <div class="entity-body">A mobile app that makes it easy for anyone to report hazards with photos and GPS location.</div>
+          <div class="entity-actions">
+            <span class="entity-action">💬 12</span>
+            <span class="entity-action support">👍 67</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOVERNMENT PROFILE -->
+      <div class="page" id="page-gov">
+        <div class="gov-header">
+          <div class="gov-cover"></div>
+          <div class="gov-logo">🏛️</div>
+          <div class="gov-info">
+            <div class="gov-name">San Francisco, CA</div>
+            <div class="gov-type">City Government · Population: 874,961</div>
+            <div class="gov-description">Official GovTrack for the City and County of San Francisco. Tracking civic goals, community problems, citizen ideas, and government actions.</div>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-value goal">12</div>
+                <div class="stat-label">Goals</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value problem">47</div>
+                <div class="stat-label">Problems</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value idea">89</div>
+                <div class="stat-label">Ideas</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value action">34</div>
+                <div class="stat-label">Actions</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="type-tabs">
+          <div class="type-tab active">Feed</div>
+          <div class="type-tab">Board</div>
+          <div class="type-tab">Heatmap</div>
+          <div class="type-tab">Stats</div>
+        </div>
+
+        <div class="entity-card">
+          <div class="entity-card-header">
+            <span class="entity-type-badge goal">Goal</span>
+            <div class="entity-meta">
+              <span>· Official</span>
+            </div>
+          </div>
+          <div class="entity-title">Vision Zero: Eliminate traffic deaths by 2030</div>
+          <div class="entity-progress">
+            <div class="progress-label">
+              <span>12/18 problems being addressed</span>
+              <span>67%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill medium" style="width: 67%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENTITY DETAIL -->
+      <div class="page" id="page-detail">
+        <div class="page-header" style="display: flex; align-items: center; gap: 12px;">
+          <button onclick="showPage('home')" style="background:none;border:none;color:var(--text-primary);cursor:pointer;font-size:1.2rem;">←</button>
+          <h1>Problem</h1>
+        </div>
+
+        <div class="entity-card" style="border-bottom: none;">
+          <div class="entity-card-header">
+            <span class="entity-type-badge problem">Problem</span>
+            <div class="entity-meta">
+              <span class="entity-gov">SF Public Works</span>
+              <span>· 4h ago</span>
+            </div>
+          </div>
+          <div class="entity-title" style="font-size: 1.2rem;">Dangerous pothole at Market & 5th intersection</div>
+          <div class="entity-body">Large pothole approximately 2 feet wide causing vehicles to swerve. Multiple near-miss incidents reported. This has been getting worse over the past month.</div>
+          <div class="entity-location">📍 Market St & 5th St, San Francisco</div>
+          <div style="height: 250px; background: linear-gradient(135deg, #333, #555); border-radius: 12px; margin: 12px 0; display: flex; align-items: center; justify-content: center; color: #888;">
+            [Photo of pothole]
+          </div>
+
+          <div style="padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 12px 0;">
+            <h3 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px;">RELATIONSHIPS</h3>
+            <div style="margin-bottom: 12px;">
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Threatens:</div>
+              <div class="relationship-chip" style="display: inline-flex;">
+                <span class="dot goal"></span>
+                Vision Zero: Eliminate traffic deaths
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Ideas addressing this:</div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div class="relationship-chip" style="display: inline-flex;">
+                  <span class="dot idea"></span>
+                  AI-powered pothole detection (128 supporters)
+                </div>
+                <div class="relationship-chip" style="display: inline-flex;">
+                  <span class="dot idea"></span>
+                  Citizen-reported hazard app (67 supporters)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="entity-actions">
+            <span class="entity-action">💬 8 comments</span>
+            <span class="entity-action">📢 15 reports</span>
+            <span class="entity-action">🔗 Link to...</span>
+            <span class="entity-action">↗️ Share</span>
+          </div>
+        </div>
+
+        <div class="comments-section">
+          <div class="reply-composer">
+            <div class="avatar small">JD</div>
+            <input type="text" class="reply-input" placeholder="Add a comment...">
+            <button class="reply-submit">Reply</button>
+          </div>
+
+          <div class="comment">
+            <div class="avatar small">MC</div>
+            <div class="comment-content">
+              <div class="comment-header">
+                <span class="comment-author">Mike Chen</span>
+                <span class="comment-handle">@mikec</span>
+                <span class="comment-time">· 2h</span>
+              </div>
+              <div class="comment-text">I nearly hit this yesterday. <span class="mention">@SFPublicWorks</span> any timeline on getting this fixed?</div>
+              <div class="comment-actions">
+                <span class="comment-action">Reply</span>
+                <span class="comment-action">👍 3</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="comment" style="background: rgba(33, 150, 243, 0.05);">
+            <div class="avatar small" style="background: #1565c0;">SF</div>
+            <div class="comment-content">
+              <div class="comment-header">
+                <span class="comment-author">SF Public Works</span>
+                <span style="background: var(--idea-color); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">OFFICIAL</span>
+                <span class="comment-time">· 1h</span>
+              </div>
+              <div class="comment-text">Thanks for reporting. We've dispatched a crew and expect repairs within 48 hours. Stay safe!</div>
+              <div class="comment-actions">
+                <span class="comment-action">Reply</span>
+                <span class="comment-action">👍 12</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IDEA DETAIL -->
+      <div class="page" id="page-detail-idea">
+        <div class="page-header" style="display: flex; align-items: center; gap: 12px;">
+          <button onclick="showPage('home')" style="background:none;border:none;color:var(--text-primary);cursor:pointer;font-size:1.2rem;">←</button>
+          <h1>Idea</h1>
+        </div>
+
+        <div class="entity-card" style="border-bottom: none;">
+          <div class="entity-card-header">
+            <span class="entity-type-badge idea">Idea</span>
+            <div class="entity-meta">
+              <span>@mikec</span>
+              <span class="entity-gov">SF Transportation</span>
+              <span>· 6h ago</span>
+            </div>
+          </div>
+          <div class="entity-title" style="font-size: 1.2rem;">Implement AI-powered pothole detection using street cameras</div>
+          <div class="entity-body">Use existing traffic cameras with computer vision to automatically detect and report road damage. This could identify problems before citizens report them, enabling proactive maintenance.<br><br>Benefits:<br>• Faster response times<br>• Lower maintenance costs long-term<br>• Improved public safety<br>• Data-driven infrastructure planning</div>
+
+          <div style="padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 12px 0;">
+            <h3 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px;">RELATIONSHIPS</h3>
+            <div style="margin-bottom: 12px;">
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Addresses problems:</div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div class="relationship-chip" style="display: inline-flex;">
+                  <span class="dot problem"></span>
+                  Dangerous pothole at Market & 5th
+                </div>
+                <div class="relationship-chip" style="display: inline-flex;">
+                  <span class="dot problem"></span>
+                  Cracked pavement on Valencia St
+                </div>
+              </div>
+            </div>
+            <div style="margin-bottom: 12px;">
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Pursues goal:</div>
+              <div class="relationship-chip" style="display: inline-flex;">
+                <span class="dot goal"></span>
+                Vision Zero: Eliminate traffic deaths
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Being implemented by:</div>
+              <div class="relationship-chip" style="display: inline-flex;">
+                <span class="dot action"></span>
+                Deploy pilot detection on Market St (In Progress)
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border);">
+            <button style="background: #00ba7c; color: white; border: none; padding: 12px 24px; border-radius: 24px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              👍 Support this idea
+            </button>
+            <span style="font-size: 1.1rem; font-weight: 700;">128 supporters</span>
+          </div>
+        </div>
+
+        <div class="comments-section">
+          <div class="reply-composer">
+            <div class="avatar small">JD</div>
+            <input type="text" class="reply-input" placeholder="Add a comment...">
+            <button class="reply-submit">Reply</button>
+          </div>
+
+          <div class="comment">
+            <div class="avatar small">SR</div>
+            <div class="comment-content">
+              <div class="comment-header">
+                <span class="comment-author">Sarah R</span>
+                <span class="comment-handle">@sarahsf</span>
+                <span class="comment-time">· 3h</span>
+              </div>
+              <div class="comment-text">Great idea! LA already does something similar. <span class="mention">@janedoe</span> didn't you mention working on something like this?</div>
+              <div class="comment-actions">
+                <span class="comment-action">Reply</span>
+                <span class="comment-action">👍 5</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOAL DETAIL -->
+      <div class="page" id="page-detail-goal">
+        <div class="page-header" style="display: flex; align-items: center; gap: 12px;">
+          <button onclick="showPage('home')" style="background:none;border:none;color:var(--text-primary);cursor:pointer;font-size:1.2rem;">←</button>
+          <h1>Goal</h1>
+        </div>
+
+        <div class="entity-card" style="border-bottom: none;">
+          <div class="entity-card-header">
+            <span class="entity-type-badge goal">Goal</span>
+            <div class="entity-meta">
+              <span class="entity-gov">SF Transportation</span>
+              <span style="background: var(--idea-color); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">OFFICIAL</span>
+            </div>
+          </div>
+          <div class="entity-title" style="font-size: 1.2rem;">Vision Zero: Eliminate traffic deaths by 2030</div>
+          <div class="entity-body">A citywide commitment to reduce traffic fatalities and serious injuries to zero through engineering, enforcement, education, and evaluation. San Francisco was the first city in the US to adopt this goal.</div>
+
+          <div class="entity-progress" style="margin: 16px 0;">
+            <div class="progress-label">
+              <span>12/18 problems being addressed</span>
+              <span style="font-weight: 700; font-size: 1.1rem;">67%</span>
+            </div>
+            <div class="progress-bar" style="height: 12px;">
+              <div class="progress-fill medium" style="width: 67%"></div>
+            </div>
+          </div>
+
+          <div style="padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 12px 0;">
+            <h3 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px;">THREATS TO THIS GOAL</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div class="relationship-chip" style="display: inline-flex; justify-content: space-between; padding: 8px 12px;">
+                <span style="display: flex; align-items: center; gap: 8px;"><span class="dot problem"></span> Dangerous pothole at Market & 5th</span>
+                <span style="background: var(--action-color); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">being addressed</span>
+              </div>
+              <div class="relationship-chip" style="display: inline-flex; justify-content: space-between; padding: 8px 12px;">
+                <span style="display: flex; align-items: center; gap: 8px;"><span class="dot problem"></span> Missing crosswalk signals at Castro & 18th</span>
+                <span style="padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">acknowledged</span>
+              </div>
+              <div class="relationship-chip" style="display: inline-flex; justify-content: space-between; padding: 8px 12px;">
+                <span style="display: flex; align-items: center; gap: 8px;"><span class="dot problem"></span> Speeding on Portola Drive</span>
+                <span style="background: var(--problem-color); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">unacknowledged</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding: 16px 0; border-bottom: 1px solid var(--border);">
+            <h3 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px;">IDEAS PURSUING THIS GOAL</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div class="relationship-chip" style="display: inline-flex; justify-content: space-between; padding: 8px 12px;">
+                <span style="display: flex; align-items: center; gap: 8px;"><span class="dot idea"></span> AI-powered pothole detection</span>
+                <span>👍 128</span>
+              </div>
+              <div class="relationship-chip" style="display: inline-flex; justify-content: space-between; padding: 8px 12px;">
+                <span style="display: flex; align-items: center; gap: 8px;"><span class="dot idea"></span> Citizen-reported hazard app</span>
+                <span>👍 67</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTION DETAIL -->
+      <div class="page" id="page-detail-action">
+        <div class="page-header" style="display: flex; align-items: center; gap: 12px;">
+          <button onclick="showPage('home')" style="background:none;border:none;color:var(--text-primary);cursor:pointer;font-size:1.2rem;">←</button>
+          <h1>Action</h1>
+        </div>
+
+        <div class="entity-card" style="border-bottom: none;">
+          <div class="entity-card-header">
+            <span class="entity-type-badge action">Action</span>
+            <div class="entity-meta">
+              <span class="entity-gov">SF Public Works</span>
+              <span style="background: var(--idea-color); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">IN PROGRESS</span>
+            </div>
+          </div>
+          <div class="entity-title" style="font-size: 1.2rem;">Deploy pilot pothole detection system on Market Street corridor</div>
+          <div class="entity-body">Install and configure AI detection system on 12 traffic cameras along Market Street as Phase 1 pilot. System will automatically detect and flag road damage for review.</div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 0; border-top: 1px solid var(--border); margin-top: 12px;">
+            <div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">Assignee</div>
+              <div style="font-weight: 600;">Infrastructure Team</div>
+            </div>
+            <div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">Due Date</div>
+              <div style="font-weight: 600;">January 30, 2026</div>
+            </div>
+          </div>
+
+          <div style="padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+            <h3 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px;">RELATIONSHIPS</h3>
+            <div style="margin-bottom: 12px;">
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Implements:</div>
+              <div class="relationship-chip" style="display: inline-flex;">
+                <span class="dot idea"></span>
+                AI-powered pothole detection
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Dependencies:</div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div class="relationship-chip" style="display: inline-flex; justify-content: space-between;">
+                  <span style="display: flex; align-items: center; gap: 8px;"><span class="dot action"></span> Procure camera hardware</span>
+                  <span style="background: var(--goal-color); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">completed</span>
+                </div>
+                <div class="relationship-chip" style="display: inline-flex; justify-content: space-between;">
+                  <span style="display: flex; align-items: center; gap: 8px;"><span class="dot action"></span> Train ML model on SF road data</span>
+                  <span style="background: var(--idea-color); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">in progress</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="right-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-section-header">Government Stats</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value goal">12</div>
+            <div class="stat-label">Goals</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value problem">47</div>
+            <div class="stat-label">Problems</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value idea">89</div>
+            <div class="stat-label">Ideas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value action">34</div>
+            <div class="stat-label">Actions</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-header">Trending Ideas</div>
+        <div class="sidebar-item" onclick="showPage('detail-idea')">
+          <div class="sidebar-item-title">AI-powered pothole detection</div>
+          <div class="sidebar-item-meta">👍 128 supporters</div>
+        </div>
+        <div class="sidebar-item">
+          <div class="sidebar-item-title">Rent stabilization expansion</div>
+          <div class="sidebar-item-meta">👍 892 supporters</div>
+        </div>
+        <div class="sidebar-item">
+          <div class="sidebar-item-title">Free MUNI for seniors</div>
+          <div class="sidebar-item-meta">👍 234 supporters</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-header">Recent Activity</div>
+        <div class="sidebar-item">
+          <div class="sidebar-item-title">Pothole repair completed</div>
+          <div class="sidebar-item-meta">Oak & Divisadero · 2h ago</div>
+        </div>
+        <div class="sidebar-item">
+          <div class="sidebar-item-title">New goal announced</div>
+          <div class="sidebar-item-meta">Zero waste by 2030 · 5h ago</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-header">Relationship Legend</div>
+        <div style="padding: 12px 16px; font-size: 0.85rem;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <div style="width: 20px; height: 2px; background: var(--problem-color); border-style: dashed;"></div>
+            <span>threatens (Problem → Goal)</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <div style="width: 20px; height: 2px; background: var(--idea-color);"></div>
+            <span>addresses (Idea → Problem)</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <div style="width: 20px; height: 2px; background: var(--goal-color);"></div>
+            <span>pursues (Idea → Goal)</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 20px; height: 2px; background: var(--action-color);"></div>
+            <span>implements (Action → Idea)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Capture Modal -->
+  <div class="modal-overlay" id="capture-modal">
+    <div class="capture-modal">
+      <div class="capture-modal-header">
+        <span style="font-weight: 700;">Capture Issue</span>
+        <button class="capture-modal-close" onclick="closeCapture()">×</button>
+      </div>
+      <div class="capture-modal-body">
+        <textarea class="capture-textarea" placeholder="What's happening in your community?" id="capture-text"></textarea>
+
+        <div style="margin-top: 12px;">
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">Government:</div>
+          <select style="width: 100%; padding: 10px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);">
+            <option>San Francisco, CA</option>
+            <option>Oakland, CA</option>
+            <option>Berkeley, CA</option>
+          </select>
+        </div>
+
+        <div class="capture-options">
+          <div class="capture-option">
+            <span>📍</span> Add location
+          </div>
+          <div class="capture-option">
+            <span>📷</span> Photo
+          </div>
+        </div>
+
+        <div style="margin-top: 12px; padding: 12px; background: var(--bg-secondary); border-radius: 8px;">
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">AI will classify this as:</div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="entity-type-badge problem" style="opacity: 0.5;">Problem</span>
+            <span class="entity-type-badge idea" style="opacity: 0.5;">Idea</span>
+            <span class="entity-type-badge goal" style="opacity: 0.5;">Goal</span>
+            <span class="entity-type-badge action" style="opacity: 0.5;">Action</span>
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px;">
+            Start typing to see AI suggestions...
+          </div>
+        </div>
+      </div>
+      <div class="capture-modal-footer">
+        <div class="capture-tools">
+          <span class="capture-tool">📷</span>
+          <span class="capture-tool">📍</span>
+          <span class="capture-tool">🏛️</span>
+        </div>
+        <button class="capture-submit" disabled>Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Map -->
+  <div class="page-map">
+    <h4>Page Map (Mockup Nav)</h4>
+    <a href="#" onclick="showPage('home')" class="current">Home Feed</a>
+    <a href="#" onclick="showPage('explore')">Explore</a>
+    <a href="#" onclick="showPage('board')">Board View</a>
+    <a href="#" onclick="showPage('heatmap')">Heatmap</a>
+    <a href="#" onclick="showPage('notifications')">Notifications</a>
+    <a href="#" onclick="showPage('review')">Review Queue</a>
+    <div class="section-label">Profiles</div>
+    <a href="#" onclick="showPage('profile')">User Profile</a>
+    <a href="#" onclick="showPage('gov')">Government</a>
+    <div class="section-label">Entity Details</div>
+    <a href="#" onclick="showPage('detail-goal')">Goal Detail</a>
+    <a href="#" onclick="showPage('detail')">Problem Detail</a>
+    <a href="#" onclick="showPage('detail-idea')">Idea Detail</a>
+    <a href="#" onclick="showPage('detail-action')">Action Detail</a>
+  </div>
+
+  <script>
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const page = document.getElementById('page-' + pageId);
+      if (page) page.classList.add('active');
+
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+      document.querySelectorAll('.page-map a').forEach(a => a.classList.remove('current'));
+      event?.target?.classList?.add('current');
+    }
+
+    function openCapture() {
+      document.getElementById('capture-modal').classList.add('active');
+    }
+
+    function closeCapture() {
+      document.getElementById('capture-modal').classList.remove('active');
+    }
+
+    // Enable submit button when text is entered
+    document.getElementById('capture-text')?.addEventListener('input', function() {
+      document.querySelector('.capture-submit').disabled = this.value.trim() === '';
+    });
+
+    // Close modal on escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeCapture();
+    });
+
+    // Close modal on overlay click
+    document.getElementById('capture-modal')?.addEventListener('click', function(e) {
+      if (e.target === this) closeCapture();
+    });
+  </script>
+</body>
+</html>
