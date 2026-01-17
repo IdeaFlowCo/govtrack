@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "cache_enabled": true,
+  "default_priority": 2,
+  "default_issue_type": "report",
+  "web_port": 3000,
+  "web_host": "localhost"
+}

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GovTrack - Local Government Issue Tracker</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>GovTrack</h1>
+    <nav>
+      <a href="/" class="active">Dashboard</a>
+      <a href="#unfiled">Unfiled Issues</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="stats" class="stats-section">
+      <div class="stat-card">
+        <span class="stat-value" id="stat-governments">-</span>
+        <span class="stat-label">Governments</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="stat-issues">-</span>
+        <span class="stat-label">Total Issues</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="stat-open">-</span>
+        <span class="stat-label">Open</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="stat-unfiled">-</span>
+        <span class="stat-label">Unfiled</span>
+      </div>
+    </section>
+
+    <section id="governments" class="card">
+      <h2>Governments</h2>
+      <table id="gov-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>State</th>
+            <th>Open</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p id="no-govs" class="empty-message" style="display:none">No governments yet. Use <code>govtrack gov add</code> to create one.</p>
+    </section>
+
+    <section id="unfiled" class="card">
+      <h2>Unfiled Issues</h2>
+      <table id="unfiled-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Priority</th>
+            <th>Title</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p id="no-unfiled" class="empty-message" style="display:none">No unfiled issues.</p>
+    </section>
+
+    <section id="recent" class="card">
+      <h2>Recent Issues</h2>
+      <table id="recent-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Government</th>
+            <th>Title</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p id="no-recent" class="empty-message" style="display:none">No issues yet.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>GovTrack - CLI-first issue tracker for local governments</p>
+  </footer>
+
+  <script>
+    const API = '/api';
+
+    async function fetchJSON(url) {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error?.message || 'API error');
+      return data.data;
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '-';
+      return new Date(iso).toLocaleDateString();
+    }
+
+    function priorityClass(p) {
+      return ['p0', 'p1', 'p2', 'p3', 'p4'][p] || 'p2';
+    }
+
+    function statusClass(s) {
+      return s.replace('_', '-');
+    }
+
+    async function loadStats() {
+      const stats = await fetchJSON(`${API}/stats`);
+      document.getElementById('stat-governments').textContent = stats.governments.total;
+      document.getElementById('stat-issues').textContent = stats.issues.total;
+      document.getElementById('stat-open').textContent = stats.issues.open;
+      document.getElementById('stat-unfiled').textContent = stats.issues.unfiled;
+    }
+
+    async function loadGovernments() {
+      const { governments } = await fetchJSON(`${API}/governments`);
+      const tbody = document.querySelector('#gov-table tbody');
+      tbody.innerHTML = '';
+
+      if (governments.length === 0) {
+        document.getElementById('no-govs').style.display = 'block';
+        document.getElementById('gov-table').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('no-govs').style.display = 'none';
+      document.getElementById('gov-table').style.display = 'table';
+
+      for (const gov of governments) {
+        const tr = document.createElement('tr');
+        tr.style.cursor = 'pointer';
+        tr.innerHTML = `
+          <td><a href="/gov/${gov.slug}" style="text-decoration:none;color:inherit"><strong>${gov.name}</strong><br><small>${gov.slug}</small></a></td>
+          <td>${gov.type}</td>
+          <td>${gov.state || '-'}</td>
+          <td>${gov.issue_count?.open || 0}</td>
+          <td>${gov.issue_count?.total || 0}</td>
+        `;
+        tr.onclick = () => window.location.href = `/gov/${gov.slug}`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    async function loadUnfiled() {
+      const { issues } = await fetchJSON(`${API}/issues?unfiled=true&limit=10`);
+      const tbody = document.querySelector('#unfiled-table tbody');
+      tbody.innerHTML = '';
+
+      if (issues.length === 0) {
+        document.getElementById('no-unfiled').style.display = 'block';
+        document.getElementById('unfiled-table').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('no-unfiled').style.display = 'none';
+      document.getElementById('unfiled-table').style.display = 'table';
+
+      for (const iss of issues) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><code>${iss.id}</code></td>
+          <td><span class="priority ${priorityClass(iss.priority)}">P${iss.priority}</span></td>
+          <td>${iss.title}</td>
+          <td>${formatDate(iss.created_at)}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    async function loadRecent() {
+      const { issues } = await fetchJSON(`${API}/issues?limit=10`);
+      const tbody = document.querySelector('#recent-table tbody');
+      tbody.innerHTML = '';
+
+      if (issues.length === 0) {
+        document.getElementById('no-recent').style.display = 'block';
+        document.getElementById('recent-table').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('no-recent').style.display = 'none';
+      document.getElementById('recent-table').style.display = 'table';
+
+      for (const iss of issues) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><code>${iss.id}</code></td>
+          <td><span class="priority ${priorityClass(iss.priority)}">P${iss.priority}</span></td>
+          <td><span class="status ${statusClass(iss.status)}">${iss.status}</span></td>
+          <td>${iss.government?.name || '<em>unfiled</em>'}</td>
+          <td>${iss.title}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    async function init() {
+      try {
+        await Promise.all([
+          loadStats(),
+          loadGovernments(),
+          loadUnfiled(),
+          loadRecent()
+        ]);
+      } catch (err) {
+        console.error('Failed to load data:', err);
+      }
+    }
+
+    init();
+    // Refresh every 5 seconds
+    setInterval(init, 5000);
+  </script>
+</body>
+</html>
