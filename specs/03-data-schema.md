@@ -95,14 +95,18 @@ interface Issue {
   // Relationship
   gov_id: string | null; // Government ID or null for unfiled
 
+  // Problem-Action relationships (Phase 1 of Problems/Actions/Needs design)
+  addresses?: string[];  // Array of problem IDs this action addresses (type="action" only)
+
   // Core fields
   title: string;        // Brief description
   body?: string;        // Detailed description (optional)
-  type: IssueType;      // Enum: report, request, complaint, other
+  type: IssueType;      // Enum: report, request, complaint, other, problem, action
 
   // Classification
   priority: Priority;   // 0-4 (0=critical, 4=backlog)
-  status: IssueStatus;  // Enum: open, in_progress, resolved, closed, wont_fix
+  status: IssueStatus;  // Actions: open, in_progress, resolved, closed, wont_fix
+                        // Problems: unacknowledged, acknowledged, being_addressed, resolved
 
   // Location (optional)
   location?: {
@@ -129,8 +133,9 @@ interface Issue {
   history?: HistoryEntry[];
 }
 
-type IssueType = "report" | "request" | "complaint" | "other";
-type IssueStatus = "open" | "in_progress" | "resolved" | "closed" | "wont_fix";
+type IssueType = "report" | "request" | "complaint" | "other" | "problem" | "action";
+type IssueStatus = "open" | "in_progress" | "resolved" | "closed" | "wont_fix"
+                 | "unacknowledged" | "acknowledged" | "being_addressed";  // Problem-specific
 type Priority = 0 | 1 | 2 | 3 | 4;
 
 interface HistoryEntry {
@@ -157,11 +162,12 @@ interface HistoryEntry {
 |-------|------|
 | id | Required, unique, format `gi-[a-f0-9]{4}` |
 | gov_id | Nullable, if set must reference existing government |
+| addresses | Optional array of issue IDs, only valid when type="action" |
 | title | Required, 1-500 characters |
 | body | Optional, max 10000 characters |
 | type | Required, must be valid enum value |
 | priority | Required, integer 0-4 |
-| status | Required, must be valid enum value |
+| status | Required, must be valid enum value (depends on type) |
 | location.address | Optional, max 500 characters |
 | location.lat | Optional, -90 to 90 |
 | location.lng | Optional, -180 to 180 |
@@ -343,6 +349,7 @@ CREATE TABLE governments (
 CREATE TABLE issues (
   id TEXT PRIMARY KEY,
   gov_id TEXT REFERENCES governments(id),
+  addresses TEXT,  -- JSON array of problem IDs (for type='action')
   title TEXT NOT NULL,
   body TEXT,
   type TEXT NOT NULL,
@@ -359,6 +366,7 @@ CREATE TABLE issues (
 CREATE INDEX idx_issues_gov_id ON issues(gov_id);
 CREATE INDEX idx_issues_status ON issues(status);
 CREATE INDEX idx_issues_priority ON issues(priority);
+CREATE INDEX idx_issues_type ON issues(type);
 
 -- Full-text search
 CREATE VIRTUAL TABLE issues_fts USING fts5(

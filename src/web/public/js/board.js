@@ -115,8 +115,28 @@ function createCard(entity) {
   // Count relations
   const relCount = graphData.edges.filter(e => e.source === entity.id || e.target === entity.id).length;
 
+  // Calculate progress for Goals based on Problems that threaten it
+  let progressHtml = '';
+  if (entity.type === 'goal') {
+    const progress = calculateGoalProgress(entity.id);
+    if (progress.total > 0) {
+      const percent = Math.round((progress.resolved / progress.total) * 100);
+      const progressClass = percent < 33 ? 'low' : percent < 67 ? 'medium' : 'high';
+      progressHtml = `
+        <div class="progress-text">
+          <span>${progress.resolved}/${progress.total} problems addressed</span>
+          <span>${percent}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill ${progressClass}" style="width: ${percent}%"></div>
+        </div>
+      `;
+    }
+  }
+
   card.innerHTML = `
     <div class="card-title">${escapeHtml(entity.title)}</div>
+    ${progressHtml}
     <div class="card-meta">
       <span class="badge priority-${entity.priority}">P${entity.priority}</span>
       <span class="status">${entity.status}</span>
@@ -130,6 +150,33 @@ function createCard(entity) {
   card.addEventListener('mouseleave', () => clearHighlights());
 
   return card;
+}
+
+/**
+ * Calculate progress for a Goal based on Problems that threaten it
+ * @param {string} goalId - The goal ID
+ * @returns {Object} { total: number, resolved: number }
+ */
+function calculateGoalProgress(goalId) {
+  // Find all Problems that "threaten" this Goal
+  const threateningProblems = graphData.edges
+    .filter(e => e.type === 'threatens' && e.target === goalId)
+    .map(e => e.source);
+
+  if (threateningProblems.length === 0) {
+    return { total: 0, resolved: 0 };
+  }
+
+  // Count how many are resolved or being_addressed
+  let resolved = 0;
+  for (const problemId of threateningProblems) {
+    const problem = graphData.nodes.find(n => n.id === problemId);
+    if (problem && (problem.status === 'resolved' || problem.status === 'being_addressed')) {
+      resolved++;
+    }
+  }
+
+  return { total: threateningProblems.length, resolved };
 }
 
 function updateCardPositions() {
